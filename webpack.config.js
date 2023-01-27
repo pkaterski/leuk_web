@@ -1,7 +1,8 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/leuk.ts',
+  entry: './leuk.ts',
+  context: path.resolve(__dirname, 'src'),
   module: {
     rules: [
       {
