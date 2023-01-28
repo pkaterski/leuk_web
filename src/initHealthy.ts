@@ -1,11 +1,15 @@
-const log = console.log;
+export const DRUGS = ["none", "Mercaptopurine", "Oncaspar", "Methotrexate", "Alexan"] as const;
+export type Drug = typeof DRUGS[number];
 
-type BloodValues = {
+export type BloodValues = {
   whiteBloodCells: number,
   redBloodCells: number,
   thrombocytes: number,
   aggressiveLeukemiaCells: number,
   nonAggressiveLeukemiaCells: number,
+  drug: Drug,
+  alive: Boolean,
+  criticalTimeStart: number | null,
 }
 
 const bloodValuesZero: BloodValues = {
@@ -14,6 +18,9 @@ const bloodValuesZero: BloodValues = {
   thrombocytes: 0,    // 150,000 to 450,000 platelets per microliter
   aggressiveLeukemiaCells: 0,
   nonAggressiveLeukemiaCells: 0,
+  drug: "none",
+  alive: true,
+  criticalTimeStart: null,
 }
 
 const initNormalBloodVals = (bvsIn: BloodValues) => {
@@ -31,7 +38,7 @@ const initNormalBloodVals = (bvsIn: BloodValues) => {
   return bvs;
 }
 
-const checkNormalVals = (bvs: BloodValues) => {
+export const checkNormalVals = (bvs: BloodValues) => {
   const res = {
     whiteBloodCells: false,
     redBloodCells: false,
@@ -48,7 +55,7 @@ const checkNormalVals = (bvs: BloodValues) => {
   return res;
 }
 
-export const generateHalthyBloodValues = () => {
+export const generateHalthyBloodValues: () => BloodValues = () => {
   // generate blood values within normal range
   const vals = initNormalBloodVals(bloodValuesZero)
 
