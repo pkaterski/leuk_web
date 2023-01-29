@@ -1,7 +1,7 @@
 .DS_Store
 *.log
 tmp/
-dist/
+# dist/
 
 *.tern-port
 node_modules/
