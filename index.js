@@ -10,6 +10,7 @@ elements.isAlive = document.getElementById("is-alive");
 elements.criticalTime = document.getElementById("critical-time");
 
 elements.pauseBtn = document.getElementById("pause-btn");
+elements.alexanBtn = document.getElementById("alexan-btn");
 
 
 let bvs = beginBVs;
@@ -22,6 +23,10 @@ elements.pauseBtn.onclick = (ev) => {
   pauseState = !pauseState;
 
   elements.pauseBtn.innerText = pauseState ? "resume" : "pause";
+};
+
+elements.alexanBtn.onclick = (ev) => {
+  bvs.drug = "Alexan";
 };
 
 const updateCellCounts = () => {
