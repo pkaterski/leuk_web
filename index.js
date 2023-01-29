@@ -9,11 +9,20 @@ elements.drugInAction = document.getElementById("drug-in-action");
 elements.isAlive = document.getElementById("is-alive");
 elements.criticalTime = document.getElementById("critical-time");
 
+elements.pauseBtn = document.getElementById("pause-btn");
+
 
 let bvs = beginBVs;
 let timePassed = 0;
 let criticalCondition = false;
+let pauseState = true;
 const TIME_INTERVAL_MS = 500;
+
+elements.pauseBtn.onclick = (ev) => {
+  pauseState = !pauseState;
+
+  elements.pauseBtn.innerText = pauseState ? "resume" : "pause";
+};
 
 const updateCellCounts = () => {
 
@@ -71,6 +80,10 @@ const updateHTMLValues = () => {
 updateHTMLValues(bvs);
 
 setInterval(() => {
+  if (pauseState) {
+    return;
+  }
+
   timePassed += TIME_INTERVAL_MS
   bvs = handleIter(bvs, timePassed)
 
