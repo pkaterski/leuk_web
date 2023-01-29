@@ -1,5 +1,7 @@
 import { BloodValues, generateHalthyBloodValues, checkNormalVals } from './initHealthy';
 
+export { checkNormalVals };
+
 const initBVs: BloodValues = generateHalthyBloodValues();
 
 function introduceLeukemia(bvsIn: BloodValues): BloodValues {
