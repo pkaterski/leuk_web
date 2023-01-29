@@ -1,5 +1,7 @@
+import { beginBVs, checkNormalVals, handleIter } from "./leuk";
+
 // get html elements
-const elements = {};
+const elements: any = {};
 elements.redBloodCellCount = document.getElementById("red-blood-cell-count");
 elements.whiteBloodCellCount = document.getElementById("white-blood-cell-count");
 elements.thrombocytesCount = document.getElementById("thrombocytes-count");
@@ -19,13 +21,13 @@ let criticalCondition = false;
 let pauseState = true;
 const TIME_INTERVAL_MS = 500;
 
-elements.pauseBtn.onclick = (ev) => {
+elements.pauseBtn.onclick = (ev: any) => {
   pauseState = !pauseState;
 
   elements.pauseBtn.innerText = pauseState ? "resume" : "pause";
 };
 
-elements.alexanBtn.onclick = (ev) => {
+elements.alexanBtn.onclick = (ev: any) => {
   bvs.drug = "Alexan";
 };
 
@@ -82,7 +84,7 @@ const updateHTMLValues = () => {
   handleCriticalTime();
 };
 
-updateHTMLValues(bvs);
+updateHTMLValues();
 
 setInterval(() => {
   if (pauseState) {
@@ -92,5 +94,5 @@ setInterval(() => {
   timePassed += TIME_INTERVAL_MS
   bvs = handleIter(bvs, timePassed)
 
-  updateHTMLValues(bvs);
+  updateHTMLValues();
 }, TIME_INTERVAL_MS)
