@@ -16,9 +16,9 @@ function introduceLeukemia(bvsIn: BloodValues): BloodValues {
   return bvs
 }
 
-export const beginBVs = introduceLeukemia(initBVs)
+export const beginBVs = introduceLeukemia(initBVs);
 
-export const CRITICAL_TIME = 3000;
+export const CRITICAL_TIME = 30000;
 
 function criticalValues(bvs: BloodValues): Boolean {
   const check = Object.values(checkNormalVals(bvs));
@@ -29,11 +29,11 @@ export function handleIter(bvsIn: BloodValues, timePassed: number): BloodValues 
   if (!bvsIn.alive)
     return bvsIn;
 
-  const bvs = {...bvsIn};
+  const bvs = { ...bvsIn };
 
   // leukemic growth
-  bvs.nonAggressiveLeukemiaCells *= 1.1;
-  bvs.aggressiveLeukemiaCells *= 1.05;
+  bvs.nonAggressiveLeukemiaCells *= 1.01;
+  bvs.aggressiveLeukemiaCells *= 1.005;
 
   // leukemic cells kill normal ones
   bvs.redBloodCells = Math.max(0, bvs.redBloodCells - bvs.aggressiveLeukemiaCells * 0.2);
