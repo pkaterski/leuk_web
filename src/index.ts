@@ -38,19 +38,19 @@ const updateCellCounts = () => {
   const areNormal = checkNormalVals(bvs);
 
   elements.whiteBloodCellCount.innerHTML = bvs.whiteBloodCells.toFixed();
-  if (!areNormal.whiteBloodCells)
+  if (areNormal.whiteBloodCells !== "normal")
     elements.whiteBloodCellCount.classList.add("critical");
   else
     elements.whiteBloodCellCount.classList.remove("critical");
 
   elements.redBloodCellCount.innerHTML = bvs.redBloodCells.toFixed();
-  if (!areNormal.redBloodCells)
+  if (areNormal.redBloodCells !== "normal")
     elements.redBloodCellCount.classList.add("critical");
   else
     elements.redBloodCellCount.classList.remove("critical");
 
   elements.thrombocytesCount.innerHTML = bvs.thrombocytes.toFixed();
-  if (!areNormal.thrombocytes)
+  if (areNormal.thrombocytes !== "normal")
     elements.thrombocytesCount.classList.add("critical");
   else
     elements.thrombocytesCount.classList.remove("critical");

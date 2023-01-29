@@ -38,19 +38,38 @@ const initNormalBloodVals = (bvsIn: BloodValues) => {
   return bvs;
 }
 
-export const checkNormalVals = (bvs: BloodValues) => {
-  const res = {
-    whiteBloodCells: false,
-    redBloodCells: false,
-    thrombocytes: false
+export type RefValue = "normal" | "high" | "low";
+
+export type BloodValueRefs = {
+  whiteBloodCells: RefValue,
+  redBloodCells: RefValue,
+  thrombocytes: RefValue,
+}
+
+export const checkNormalVals = (bvs: BloodValues): BloodValueRefs => {
+  const res: BloodValueRefs = {
+    whiteBloodCells: "normal",
+    redBloodCells: "normal",
+    thrombocytes: "normal",
   };
 
-  if (bvs.whiteBloodCells >= 4500 && bvs.whiteBloodCells <= 11000)
-    res.whiteBloodCells = true;
-  if (bvs.redBloodCells >= 4700000 && bvs.redBloodCells <= 6100000)
-    res.redBloodCells = true;
-  if (bvs.thrombocytes >= 150000 && bvs.thrombocytes <= 450000)
-    res.thrombocytes = true;
+  if (bvs.whiteBloodCells < 4500) {
+    res.whiteBloodCells = "low";
+  } else if (bvs.whiteBloodCells > 11000) {
+    res.whiteBloodCells = "high";
+  }
+
+  if (bvs.redBloodCells < 4700000) {
+    res.redBloodCells = "low";
+  } else if (bvs.redBloodCells > 6100000) {
+    res.redBloodCells = "high";
+  }
+
+  if (bvs.thrombocytes < 150000) {
+    res.thrombocytes = "low";
+  } else if (bvs.thrombocytes > 450000) {
+    res.thrombocytes = "high";
+  }
 
   return res;
 }
@@ -65,13 +84,3 @@ export const generateHalthyBloodValues: () => BloodValues = () => {
 
   return vals;
 }
-
-//
-// for (let i = 0; i < 10000; i++) {
-//   const bvs = initNormalBloodVals(bloodValuesZero)
-//   const checkBvs = checkNormalVals(bvs)
-//   const vals = Object.values(checkBvs)
-//   if (!vals.every(p => p)) {
-//     log(vals)
-//   }
-// }

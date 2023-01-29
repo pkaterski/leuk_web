@@ -1,4 +1,4 @@
-import { BloodValues, generateHalthyBloodValues, checkNormalVals, Drug } from './initHealthy';
+import { BloodValues, generateHalthyBloodValues, checkNormalVals, Drug, RefValue } from './initHealthy';
 
 export { checkNormalVals };
 
@@ -19,11 +19,6 @@ function introduceLeukemia(bvsIn: BloodValues): BloodValues {
 export const beginBVs = introduceLeukemia(initBVs);
 
 export const CRITICAL_TIME = 30000;
-
-function criticalValues(bvs: BloodValues): Boolean {
-  const check = Object.values(checkNormalVals(bvs));
-  return !check.every(Boolean);
-}
 
 export function getDrugWareOffTime(drug: Drug): number {
   switch (drug) {
@@ -50,11 +45,17 @@ export function handleIter(bvsIn: BloodValues, timePassed: number): BloodValues 
   bvs.whiteBloodCells = Math.max(0, bvs.whiteBloodCells - bvs.aggressiveLeukemiaCells * 0.2);
   bvs.thrombocytes = Math.max(0, bvs.thrombocytes - bvs.aggressiveLeukemiaCells * 0.2);
 
+  const checkRefs = checkNormalVals(bvs);
+  const hasCritical = !Object.values(checkRefs).every(v => v === "normal");
+
   if (bvs.criticalTimeStart === null) {
-    if (criticalValues(bvs))
+    if (hasCritical)
       bvs.criticalTimeStart = timePassed;
-  } else if (timePassed - bvs.criticalTimeStart > CRITICAL_TIME) {
-    bvs.alive = false;
+  } else  {
+    if (!hasCritical)
+      bvs.criticalTimeStart = null;
+    else if (timePassed - bvs.criticalTimeStart > CRITICAL_TIME)
+      bvs.alive = false;
   }
 
   // handle drug wareoff
@@ -68,7 +69,30 @@ export function handleIter(bvsIn: BloodValues, timePassed: number): BloodValues 
     if (d >= wareOffTime) {
       bvs.drug = null;
     }
+
+    // handle drug action
+    bvs.redBloodCells *= 0.9;
+    bvs.whiteBloodCells *= 0.9;
+    bvs.thrombocytes *= 0.9;
+    bvs.aggressiveLeukemiaCells *= 0.4;
+    bvs.nonAggressiveLeukemiaCells *= 0.5;
   }
+
+
+  // handle normalization
+  const normalFactor = (r: RefValue) =>
+    r == "high"
+      ? -1
+      : r == "low"
+        ? 1
+        : 0;
+  // bvs.redBloodCells   += 100000;
+  // bvs.whiteBloodCells += 1000;
+  // bvs.thrombocytes    += 10000;
+  bvs.redBloodCells   *= 1 + normalFactor(checkRefs.redBloodCells)   * 0.05;
+  bvs.whiteBloodCells *= 1 + normalFactor(checkRefs.whiteBloodCells) * 0.05;
+  bvs.thrombocytes    *= 1 + normalFactor(checkRefs.thrombocytes)    * 0.05;
+
 
   return bvs;
 }
