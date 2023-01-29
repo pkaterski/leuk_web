@@ -1,4 +1,4 @@
-import { BloodValues, generateHalthyBloodValues, checkNormalVals } from './initHealthy';
+import { BloodValues, generateHalthyBloodValues, checkNormalVals, Drug } from './initHealthy';
 
 export { checkNormalVals };
 
@@ -25,6 +25,16 @@ function criticalValues(bvs: BloodValues): Boolean {
   return !check.every(Boolean);
 }
 
+export function getDrugWareOffTime(drug: Drug): number {
+  switch (drug) {
+    case "Alexan": return 10000;
+    case "Oncaspar": return 15000;
+    case "Methotrexate": return 15000;
+    case "Mercaptopurine": return 15000;
+    default: return 0;
+  }
+}
+
 export function handleIter(bvsIn: BloodValues, timePassed: number): BloodValues {
   if (!bvsIn.alive)
     return bvsIn;
@@ -45,6 +55,19 @@ export function handleIter(bvsIn: BloodValues, timePassed: number): BloodValues 
       bvs.criticalTimeStart = timePassed;
   } else if (timePassed - bvs.criticalTimeStart > CRITICAL_TIME) {
     bvs.alive = false;
+  }
+
+  // handle drug wareoff
+  if (bvs.drug !== null) {
+    const wareOffTime = getDrugWareOffTime(bvs.drug.type);
+
+    const t0 = bvs.drug.introductionTime;
+    const t1 = timePassed;
+    const d = t1 - t0;
+
+    if (d >= wareOffTime) {
+      bvs.drug = null;
+    }
   }
 
   return bvs;

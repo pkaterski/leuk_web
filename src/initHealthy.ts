@@ -1,4 +1,4 @@
-export const DRUGS = ["none", "Mercaptopurine", "Oncaspar", "Methotrexate", "Alexan"] as const;
+export const DRUGS = ["Mercaptopurine", "Oncaspar", "Methotrexate", "Alexan"] as const;
 export type Drug = typeof DRUGS[number];
 
 export type BloodValues = {
@@ -7,7 +7,7 @@ export type BloodValues = {
   thrombocytes: number,
   aggressiveLeukemiaCells: number,
   nonAggressiveLeukemiaCells: number,
-  drug: Drug,
+  drug: { type: Drug, introductionTime: number } | null,
   alive: Boolean,
   criticalTimeStart: number | null,
 }
@@ -18,7 +18,7 @@ const bloodValuesZero: BloodValues = {
   thrombocytes: 0,    // 150,000 to 450,000 platelets per microliter
   aggressiveLeukemiaCells: 0,
   nonAggressiveLeukemiaCells: 0,
-  drug: "none",
+  drug: null,
   alive: true,
   criticalTimeStart: null,
 }

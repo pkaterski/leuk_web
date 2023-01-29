@@ -1,4 +1,4 @@
-import { beginBVs, checkNormalVals, handleIter } from "./leuk";
+import { beginBVs, checkNormalVals, getDrugWareOffTime, handleIter } from "./leuk";
 
 // get html elements
 const elements: any = {};
@@ -17,8 +17,8 @@ elements.alexanBtn = document.getElementById("alexan-btn");
 
 let bvs = beginBVs;
 let timePassed = 0;
-let criticalCondition = false;
 let pauseState = true;
+let drugWareOffTime: number | null = null;
 const TIME_INTERVAL_MS = 500;
 
 elements.pauseBtn.onclick = (ev: any) => {
@@ -28,7 +28,8 @@ elements.pauseBtn.onclick = (ev: any) => {
 };
 
 elements.alexanBtn.onclick = (ev: any) => {
-  bvs.drug = "Alexan";
+  bvs.drug = {type: "Alexan", introductionTime: timePassed};
+  drugWareOffTime = getDrugWareOffTime("Alexan");
 };
 
 const updateCellCounts = () => {
@@ -78,7 +79,19 @@ const updateHTMLValues = () => {
   }
 
   updateCellCounts();
-  elements.drugInAction.innerHTML = bvs.drug;
+
+  if (bvs.drug !== null) {
+    if (drugWareOffTime) {
+      const drugTimePassed = timePassed - bvs.drug.introductionTime;
+      const timeRemaining = drugWareOffTime - drugTimePassed;
+      const timeRemainingStr = (timeRemaining / 1000).toFixed(1);
+      elements.drugInAction.innerHTML = `${bvs.drug.type} (${timeRemainingStr} units remaining)`;
+    }
+  } else {
+    elements.drugInAction.innerHTML = "none";
+    drugWareOffTime = null;
+  }
+
   elements.isAlive.innerHTML = bvs.alive;
 
   handleCriticalTime();
