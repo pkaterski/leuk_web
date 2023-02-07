@@ -1,4 +1,10 @@
-import { BloodValues, generateHalthyBloodValues, checkNormalVals, Drug, RefValue } from './initHealthy';
+import {
+  BloodValues,
+  generateHalthyBloodValues,
+  checkNormalVals,
+  Drug,
+  RefValue,
+} from "./initHealthy";
 
 export { checkNormalVals };
 
@@ -12,8 +18,7 @@ function introduceLeukemia(bvsIn: BloodValues): BloodValues {
   bvs.aggressiveLeukemiaCells += amtToAdd;
   bvs.nonAggressiveLeukemiaCells += amtToAdd;
 
-
-  return bvs
+  return bvs;
 }
 
 export const beginBVs = introduceLeukemia(initBVs);
@@ -22,17 +27,24 @@ export const CRITICAL_TIME = 30000;
 
 export function getDrugWareOffTime(drug: Drug): number {
   switch (drug) {
-    case "Alexan": return 10000;
-    case "Oncaspar": return 15000;
-    case "Methotrexate": return 15000;
-    case "Mercaptopurine": return 15000;
-    default: return 0;
+    case "Alexan":
+      return 10000;
+    case "Oncaspar":
+      return 15000;
+    case "Methotrexate":
+      return 15000;
+    case "Mercaptopurine":
+      return 15000;
+    default:
+      return 0;
   }
 }
 
-export function handleIter(bvsIn: BloodValues, timePassed: number): BloodValues {
-  if (!bvsIn.alive)
-    return bvsIn;
+export function handleIter(
+  bvsIn: BloodValues,
+  timePassed: number
+): BloodValues {
+  if (!bvsIn.alive) return bvsIn;
 
   const bvs = { ...bvsIn };
 
@@ -41,19 +53,26 @@ export function handleIter(bvsIn: BloodValues, timePassed: number): BloodValues 
   bvs.aggressiveLeukemiaCells *= 1.005;
 
   // leukemic cells kill normal ones
-  bvs.redBloodCells = Math.max(0, bvs.redBloodCells - bvs.aggressiveLeukemiaCells * 0.2);
-  bvs.whiteBloodCells = Math.max(0, bvs.whiteBloodCells - bvs.aggressiveLeukemiaCells * 0.2);
-  bvs.thrombocytes = Math.max(0, bvs.thrombocytes - bvs.aggressiveLeukemiaCells * 0.2);
+  bvs.redBloodCells = Math.max(
+    0,
+    bvs.redBloodCells - bvs.aggressiveLeukemiaCells * 0.2
+  );
+  bvs.whiteBloodCells = Math.max(
+    0,
+    bvs.whiteBloodCells - bvs.aggressiveLeukemiaCells * 0.2
+  );
+  bvs.thrombocytes = Math.max(
+    0,
+    bvs.thrombocytes - bvs.aggressiveLeukemiaCells * 0.2
+  );
 
   const checkRefs = checkNormalVals(bvs);
-  const hasCritical = !Object.values(checkRefs).every(v => v === "normal");
+  const hasCritical = !Object.values(checkRefs).every((v) => v === "normal");
 
   if (bvs.criticalTimeStart === null) {
-    if (hasCritical)
-      bvs.criticalTimeStart = timePassed;
-  } else  {
-    if (!hasCritical)
-      bvs.criticalTimeStart = null;
+    if (hasCritical) bvs.criticalTimeStart = timePassed;
+  } else {
+    if (!hasCritical) bvs.criticalTimeStart = null;
     else if (timePassed - bvs.criticalTimeStart > CRITICAL_TIME)
       bvs.alive = false;
   }
@@ -78,22 +97,14 @@ export function handleIter(bvsIn: BloodValues, timePassed: number): BloodValues 
     bvs.nonAggressiveLeukemiaCells *= 0.5;
   }
 
-
   // handle normalization
-  const normalFactor = (r: RefValue) =>
-    r == "high"
-      ? -1
-      : r == "low"
-        ? 1
-        : 0;
+  const normalFactor = (r: RefValue) => (r == "high" ? -1 : r == "low" ? 1 : 0);
   // bvs.redBloodCells   += 100000;
   // bvs.whiteBloodCells += 1000;
   // bvs.thrombocytes    += 10000;
-  bvs.redBloodCells   *= 1 + normalFactor(checkRefs.redBloodCells)   * 0.05;
+  bvs.redBloodCells *= 1 + normalFactor(checkRefs.redBloodCells) * 0.05;
   bvs.whiteBloodCells *= 1 + normalFactor(checkRefs.whiteBloodCells) * 0.05;
-  bvs.thrombocytes    *= 1 + normalFactor(checkRefs.thrombocytes)    * 0.05;
-
+  bvs.thrombocytes *= 1 + normalFactor(checkRefs.thrombocytes) * 0.05;
 
   return bvs;
 }
-

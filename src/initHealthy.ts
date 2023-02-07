@@ -1,27 +1,32 @@
-export const DRUGS = ["Mercaptopurine", "Oncaspar", "Methotrexate", "Alexan"] as const;
+export const DRUGS = [
+  "Mercaptopurine",
+  "Oncaspar",
+  "Methotrexate",
+  "Alexan",
+] as const;
 export type Drug = typeof DRUGS[number];
 
 export type BloodValues = {
-  whiteBloodCells: number,
-  redBloodCells: number,
-  thrombocytes: number,
-  aggressiveLeukemiaCells: number,
-  nonAggressiveLeukemiaCells: number,
-  drug: { type: Drug, introductionTime: number } | null,
-  alive: Boolean,
-  criticalTimeStart: number | null,
-}
+  whiteBloodCells: number;
+  redBloodCells: number;
+  thrombocytes: number;
+  aggressiveLeukemiaCells: number;
+  nonAggressiveLeukemiaCells: number;
+  drug: { type: Drug; introductionTime: number } | null;
+  alive: Boolean;
+  criticalTimeStart: number | null;
+};
 
 const bloodValuesZero: BloodValues = {
   whiteBloodCells: 0, // 4,500 to 11,000 WBCs per microliter
-  redBloodCells: 0,   // 4.7 to 6.1 million cells per microliter
-  thrombocytes: 0,    // 150,000 to 450,000 platelets per microliter
+  redBloodCells: 0, // 4.7 to 6.1 million cells per microliter
+  thrombocytes: 0, // 150,000 to 450,000 platelets per microliter
   aggressiveLeukemiaCells: 0,
   nonAggressiveLeukemiaCells: 0,
   drug: null,
   alive: true,
   criticalTimeStart: null,
-}
+};
 
 const initNormalBloodVals = (bvsIn: BloodValues) => {
   const bvs = { ...bvsIn };
@@ -36,15 +41,15 @@ const initNormalBloodVals = (bvsIn: BloodValues) => {
   bvs.thrombocytes = t;
 
   return bvs;
-}
+};
 
 export type RefValue = "normal" | "high" | "low";
 
 export type BloodValueRefs = {
-  whiteBloodCells: RefValue,
-  redBloodCells: RefValue,
-  thrombocytes: RefValue,
-}
+  whiteBloodCells: RefValue;
+  redBloodCells: RefValue;
+  thrombocytes: RefValue;
+};
 
 export const checkNormalVals = (bvs: BloodValues): BloodValueRefs => {
   const res: BloodValueRefs = {
@@ -72,15 +77,15 @@ export const checkNormalVals = (bvs: BloodValues): BloodValueRefs => {
   }
 
   return res;
-}
+};
 
 export const generateHalthyBloodValues: () => BloodValues = () => {
   // generate blood values within normal range
-  const vals = initNormalBloodVals(bloodValuesZero)
+  const vals = initNormalBloodVals(bloodValuesZero);
 
   // initiate empty leukemic cells
   vals.aggressiveLeukemiaCells = 0;
   vals.nonAggressiveLeukemiaCells = 0;
 
   return vals;
-}
+};
