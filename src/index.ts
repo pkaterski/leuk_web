@@ -4,6 +4,7 @@ import {
   getDrugWareOffTime,
   handleIter,
 } from "./leuk";
+import { generateEvenlySpread } from "./treatment";
 
 // get html elements
 const elements: any = {};
@@ -29,7 +30,7 @@ let bvs = beginBVs;
 let timePassed = 0;
 let pauseState = true;
 let drugWareOffTime: number | null = null;
-const TIME_INTERVAL_MS = 500;
+const TIME_INTERVAL_MS = 100;
 
 elements.pauseBtn.onclick = (ev: any) => {
   pauseState = !pauseState;
@@ -108,13 +109,26 @@ const updateHTMLValues = () => {
 
 updateHTMLValues();
 
+const terapyCourses = generateEvenlySpread("Alexan", 10000, 4);
+
 setInterval(() => {
   if (pauseState) {
     return;
   }
 
   timePassed += TIME_INTERVAL_MS;
-  bvs = handleIter(bvs, timePassed);
+  bvs = handleIter(bvs, timePassed, terapyCourses);
 
   updateHTMLValues();
 }, TIME_INTERVAL_MS);
+
+// console handle
+// (() => {
+//   let bvs = beginBVs;
+//   let time = 0;
+
+//   for (let i = 0; i < 1000; i++) {
+//     // console.log(bvs);
+//     bvs = handleIter(bvs, time);
+//   }
+// })();

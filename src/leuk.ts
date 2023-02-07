@@ -6,6 +6,7 @@ import {
   RefValue,
   BloodValueRefs,
 } from "./initHealthy";
+import { TreatmentCourse } from "./treatment";
 
 export { checkNormalVals };
 
@@ -29,7 +30,7 @@ export const CRITICAL_TIME = 30000;
 export function getDrugWareOffTime(drug: Drug): number {
   switch (drug) {
     case "Alexan":
-      return 10000;
+      return 1000;
     case "Oncaspar":
       return 15000;
     case "Methotrexate":
@@ -56,11 +57,11 @@ function handleDrugAction(bvs: BloodValues, timePassed: number) {
     }
 
     // handle drug action
-    bvs.redBloodCells *= 0.9;
-    bvs.whiteBloodCells *= 0.9;
-    bvs.thrombocytes *= 0.9;
-    bvs.aggressiveLeukemiaCells *= 0.4;
-    bvs.nonAggressiveLeukemiaCells *= 0.5;
+    bvs.redBloodCells *= 0.8;
+    bvs.whiteBloodCells *= 0.8;
+    bvs.thrombocytes *= 0.8;
+    bvs.aggressiveLeukemiaCells *= 0.6;
+    bvs.nonAggressiveLeukemiaCells *= 0.8;
   }
 }
 
@@ -75,9 +76,26 @@ function normalizeBloodCells(bvs: BloodValues, checkRefs: BloodValueRefs) {
   bvs.thrombocytes *= 1 + normalFactor(checkRefs.thrombocytes) * 0.05;
 }
 
+function handleCriticalCondition(
+  bvs: BloodValues,
+  checkRefs: BloodValueRefs,
+  timePassed: number
+) {
+  const hasCritical = !Object.values(checkRefs).every((v) => v === "normal");
+
+  if (bvs.criticalTimeStart === null) {
+    if (hasCritical) bvs.criticalTimeStart = timePassed;
+  } else {
+    if (!hasCritical) bvs.criticalTimeStart = null;
+    else if (timePassed - bvs.criticalTimeStart > CRITICAL_TIME)
+      bvs.alive = false;
+  }
+}
+
 export function handleIter(
   bvsIn: BloodValues,
-  timePassed: number
+  timePassed: number,
+  treatmentCourse: TreatmentCourse[] = []
 ): BloodValues {
   if (!bvsIn.alive) return bvsIn;
 
@@ -101,20 +119,24 @@ export function handleIter(
     bvs.thrombocytes - bvs.aggressiveLeukemiaCells * 0.2
   );
 
-  const checkRefs = checkNormalVals(bvs);
-  const hasCritical = !Object.values(checkRefs).every((v) => v === "normal");
+  let checkRefs = checkNormalVals(bvs);
 
-  if (bvs.criticalTimeStart === null) {
-    if (hasCritical) bvs.criticalTimeStart = timePassed;
-  } else {
-    if (!hasCritical) bvs.criticalTimeStart = null;
-    else if (timePassed - bvs.criticalTimeStart > CRITICAL_TIME)
-      bvs.alive = false;
+  // administer drugs
+  console.log({ treatmentCourse, timePassed });
+  const index = treatmentCourse.findIndex((i) => i.atTime === timePassed);
+  if (index !== -1) {
+    console.log(`drug administered at ${timePassed}`);
+    bvs.drug = {
+      type: treatmentCourse[index].drug,
+      introductionTime: timePassed,
+    };
   }
 
   handleDrugAction(bvs, timePassed);
-
   normalizeBloodCells(bvs, checkRefs);
+
+  checkRefs = checkNormalVals(bvs);
+  handleCriticalCondition(bvs, checkRefs, timePassed);
 
   return bvs;
 }
