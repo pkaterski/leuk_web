@@ -4,6 +4,7 @@ import {
   checkNormalVals,
   Drug,
   RefValue,
+  BloodValueRefs,
 } from "./initHealthy";
 
 export { checkNormalVals };
@@ -38,6 +39,40 @@ export function getDrugWareOffTime(drug: Drug): number {
     default:
       return 0;
   }
+}
+
+// modifies bvs
+function handleDrugAction(bvs: BloodValues, timePassed: number) {
+  // handle drug wareoff
+  if (bvs.drug !== null) {
+    const wareOffTime = getDrugWareOffTime(bvs.drug.type);
+
+    const t0 = bvs.drug.introductionTime;
+    const t1 = timePassed;
+    const d = t1 - t0;
+
+    if (d >= wareOffTime) {
+      bvs.drug = null;
+    }
+
+    // handle drug action
+    bvs.redBloodCells *= 0.9;
+    bvs.whiteBloodCells *= 0.9;
+    bvs.thrombocytes *= 0.9;
+    bvs.aggressiveLeukemiaCells *= 0.4;
+    bvs.nonAggressiveLeukemiaCells *= 0.5;
+  }
+}
+
+function normalizeBloodCells(bvs: BloodValues, checkRefs: BloodValueRefs) {
+  // handle normalization
+  const normalFactor = (r: RefValue) => (r == "high" ? -1 : r == "low" ? 1 : 0);
+  // bvs.redBloodCells   += 100000;
+  // bvs.whiteBloodCells += 1000;
+  // bvs.thrombocytes    += 10000;
+  bvs.redBloodCells *= 1 + normalFactor(checkRefs.redBloodCells) * 0.05;
+  bvs.whiteBloodCells *= 1 + normalFactor(checkRefs.whiteBloodCells) * 0.05;
+  bvs.thrombocytes *= 1 + normalFactor(checkRefs.thrombocytes) * 0.05;
 }
 
 export function handleIter(
@@ -77,34 +112,9 @@ export function handleIter(
       bvs.alive = false;
   }
 
-  // handle drug wareoff
-  if (bvs.drug !== null) {
-    const wareOffTime = getDrugWareOffTime(bvs.drug.type);
+  handleDrugAction(bvs, timePassed);
 
-    const t0 = bvs.drug.introductionTime;
-    const t1 = timePassed;
-    const d = t1 - t0;
-
-    if (d >= wareOffTime) {
-      bvs.drug = null;
-    }
-
-    // handle drug action
-    bvs.redBloodCells *= 0.9;
-    bvs.whiteBloodCells *= 0.9;
-    bvs.thrombocytes *= 0.9;
-    bvs.aggressiveLeukemiaCells *= 0.4;
-    bvs.nonAggressiveLeukemiaCells *= 0.5;
-  }
-
-  // handle normalization
-  const normalFactor = (r: RefValue) => (r == "high" ? -1 : r == "low" ? 1 : 0);
-  // bvs.redBloodCells   += 100000;
-  // bvs.whiteBloodCells += 1000;
-  // bvs.thrombocytes    += 10000;
-  bvs.redBloodCells *= 1 + normalFactor(checkRefs.redBloodCells) * 0.05;
-  bvs.whiteBloodCells *= 1 + normalFactor(checkRefs.whiteBloodCells) * 0.05;
-  bvs.thrombocytes *= 1 + normalFactor(checkRefs.thrombocytes) * 0.05;
+  normalizeBloodCells(bvs, checkRefs);
 
   return bvs;
 }
