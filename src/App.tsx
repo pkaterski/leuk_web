@@ -1,32 +1,92 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import { BloodValues } from './leukLogic/initHealthy';
+import { beginBVs, handleIter } from './leukLogic/leuk';
+import { generateEvenlySpread } from './leukLogic/treatment';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const TIME_INTERVAL_MS = 100;
+  const terapyCourses = generateEvenlySpread("Alexan", 10000, 4);
+
+  const [started, setStarted] = useState(false);
+  const [pauseState, setPauseState] = useState(true);
+  const pauseStateRef = useRef(pauseState);
+  useEffect(() => {
+    pauseStateRef.current = pauseState;
+  }, [pauseState]);
+  const [timePassed, setTimePassed] = useState(0);
+  const timePassedRef = useRef(timePassed);
+  useEffect(() => {
+    timePassedRef.current = timePassed;
+  }, [timePassed]);
+  const [bvs, setBvs] = useState<BloodValues>(beginBVs);
+  const bvsRef = useRef(bvs);
+  useEffect(() => {
+    bvsRef.current = bvs;
+  }, [bvs]);
+
+  useEffect(() => {
+
+    const intervalId = setInterval(() => {
+      if (pauseStateRef.current) {
+        return;
+      }
+
+      setTimePassed(t => t + TIME_INTERVAL_MS);
+      setBvs(handleIter(bvsRef.current,
+                        timePassedRef.current,
+                        terapyCourses));
+
+    }, 100);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <div className="container">
+      <h1>Leaukemia</h1>
+
+      <h4>Blood values:</h4>
+
+      {/* normal blood cells */}
+      <ul>
+        <li>Redbloodcells:<span id="red-blood-cell-count">{bvs.redBloodCells.toFixed()}</span></li>
+        <li>Whitebloodcells:<span id="white-blood-cell-count">{bvs.whiteBloodCells.toFixed()}</span></li>
+        <li>thrombocytes:<span id="thrombocytes-count">{bvs.thrombocytes.toFixed()}</span></li>
+      </ul>
+
+      <ul>
+        {/* leukemic cells */}
+        <li>
+          aggressive leukemia cells:
+          <span id="aggressive-leukemia-cell-count">{bvs.aggressiveLeukemiaCells.toFixed()}</span>
+        </li>
+        <li>
+          non-aggressive leukemia cells:
+          <span id="non-aggressive-leukemia-cell-count">{bvs.nonAggressiveLeukemiaCells.toFixed()}</span>
+        </li>
+      </ul>
+
+      <ul>
+        {/* drug in action */}
+        <li>drug in action: <span id="drug-in-action">none</span></li>
+
+        {/* status */}
+        <li>is alive: <span id="is-alive">{bvs.alive + ''}</span></li>
+
+        {/* metadata */}
+        <li>
+          (metadata) time since in critical condition:
+          <span id="critical-time">0</span>
+        </li>
+      </ul>
+
+      {/* buttons */}
+      <button type="button" id="pause-btn" onClick={() => {setPauseState(i => !i); setStarted(true)}}>
+        {!started ? "start" : pauseState ? "resume" : "pause"}
+      </button>
+      <button type="button" id="alexan-btn">Introduce Alexan</button>
+    </div>
     </div>
   )
 }
