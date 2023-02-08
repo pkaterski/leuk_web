@@ -1,52 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Page Title</title>
-    <link type="text/css" rel="stylesheet" href="./style.css" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
   </head>
   <body>
-    <div class="container">
-      <h1>Leaukemia</h1>
-
-      <h4>Blood values:</h4>
-
-      <!-- normal blood cells -->
-      <ul>
-        <li>Red blood cells: <span id="red-blood-cell-count">0</span></li>
-        <li>White blood cells: <span id="white-blood-cell-count">0</span></li>
-        <li>thrombocytes: <span id="thrombocytes-count">0</span></li>
-      </ul>
-
-      <ul>
-        <!-- leukemic cells -->
-        <li>
-          aggressive leukemia cells:
-          <span id="aggressive-leukemia-cell-count">0</span>
-        </li>
-        <li>
-          non-aggressive leukemia cells:
-          <span id="non-aggressive-leukemia-cell-count">0</span>
-        </li>
-      </ul>
-
-      <ul>
-        <!-- drug in action -->
-        <li>drug in action: <span id="drug-in-action">none</span></li>
-
-        <!-- status -->
-        <li>is alive: <span id="is-alive">false</span></li>
-
-        <!-- metadata -->
-        <li>
-          (metadata) time since in critical condition:
-          <span id="critical-time">0</span>
-        </li>
-      </ul>
-
-      <!-- buttons -->
-      <button type="button" id="pause-btn">start</button>
-      <button type="button" id="alexan-btn">Introduce Alexan</button>
-    </div>
-    <script type="text/javascript" src="./dist/bundle.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
