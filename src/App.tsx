@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import { BloodValueRefs, BloodValues, checkNormalVals, Drug } from './leukLogic/initHealthy';
+import { BloodValueRefs, BloodValues, checkNormalVals } from './leukLogic/initHealthy';
 import { beginBVs, getDrugWareOffTime, handleIter } from './leukLogic/leuk';
 import { generateEvenlySpread } from './leukLogic/treatment';
 
