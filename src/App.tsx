@@ -6,7 +6,7 @@ import { generateEvenlySpread, TreatmentCourse } from './leukLogic/treatment';
 
 function App() {
   const TIME_INTERVAL_MS = 100;
-  const terapyCourses: TreatmentCourse[] = []; //generateEvenlySpread("Alexan", 10000, 4);
+  const terapyCourses: TreatmentCourse[] = generateEvenlySpread("Alexan", 10000, 4);
 
   const [started, setStarted] = useState(false);
   const [pauseState, setPauseState] = useState(true);
