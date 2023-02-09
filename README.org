@@ -1,4 +1,7 @@
-#+title: README
+#+title: Leukemia
 
-* Leukemia
+* Intro
 todo
+
+* config
+- run to include git hooks `git config --local include.path ../.gitconfig`
