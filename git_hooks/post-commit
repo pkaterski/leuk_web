@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# nvm lazy
+export NVM_DIR=$HOME/.nvm;
+source $NVM_DIR/nvm.sh;
+
+echo "building vite project"
+npx vite build
+
+git add dist/
+git -c core.hooksPath=/dev/null commit --amend --no-edit
