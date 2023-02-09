@@ -122,7 +122,6 @@ export function handleIter(
   let checkRefs = checkNormalVals(bvs);
 
   // administer drugs
-  console.log({ treatmentCourse, timePassed });
   const index = treatmentCourse.findIndex((i) => i.atTime === timePassed);
   if (index !== -1) {
     console.log(`drug administered at ${timePassed}`);
