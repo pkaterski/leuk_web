@@ -8,6 +8,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <script type="module">
+      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        console.log("--- DEV ENV ---");
+      } else {
+        window.location.replace("https://pkaterski.github.io/leuk_web/dist/index.html");
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
