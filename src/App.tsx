@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { BloodValueRefs, BloodValues, checkNormalVals } from './leukLogic/initHealthy';
 import { beginBVs, getDrugWareOffTime, handleIter } from './leukLogic/leuk';
-import { generateEvenlySpread } from './leukLogic/treatment';
+import { generateEvenlySpread, TreatmentCourse } from './leukLogic/treatment';
 
 function App() {
   const TIME_INTERVAL_MS = 100;
-  const terapyCourses = generateEvenlySpread("Alexan", 10000, 4);
+  const terapyCourses: TreatmentCourse[] = []; //generateEvenlySpread("Alexan", 10000, 4);
 
   const [started, setStarted] = useState(false);
   const [pauseState, setPauseState] = useState(true);
@@ -79,6 +79,12 @@ function App() {
     return () => clearInterval(intervalId);
   }, []);
 
+  const onIntroduceAlexan = () => {
+    setBvs((bvs) => {
+      return { ...bvs, drug: {type: "Alexan", introductionTime: timePassed} }
+    });
+  };
+
   return (
     <div className="App">
       <div className="container">
@@ -145,7 +151,7 @@ function App() {
       <button type="button" id="pause-btn" onClick={() => {setPauseState(i => !i); setStarted(true)}}>
         {!started ? "start" : pauseState ? "resume" : "pause"}
       </button>
-      <button type="button" id="alexan-btn">Introduce Alexan</button>
+      <button type="button" id="alexan-btn" onClick={onIntroduceAlexan}>Introduce Alexan</button>
     </div>
     </div>
   )
