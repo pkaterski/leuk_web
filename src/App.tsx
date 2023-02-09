@@ -39,6 +39,7 @@ function App() {
     drugWareOffTimeRef.current = drugWareOffTime;
   }, [drugWareOffTime]);
   const [drugTimeRemaining, setDrugTimeRemaining] = useState('0');
+  const [criticalTime, setCriticalTime] = useState<string | null>(null);
 
   useEffect(() => {
 
@@ -66,6 +67,13 @@ function App() {
       } else if (drugWareOffTimeRef.current !== null) {
         setDrugWareOffTime(null);
       }
+
+      if (bvsRef.current.criticalTimeStart !== null) {
+        setCriticalTime(((timePassedRef.current - bvsRef.current.criticalTimeStart) / 1000).toFixed(1) + " units")
+      } else {
+        setCriticalTime(null);
+      }
+
 
     }, 100);
     return () => clearInterval(intervalId);
@@ -127,7 +135,9 @@ function App() {
         {/* metadata */}
         <li>
           (metadata) time since in critical condition:
-          <span id="critical-time">0</span>
+          <span id="critical-time" className={criticalTime === null ? "" : "critical"}>
+            {criticalTime !== null ? criticalTime : "0"}
+          </span>
         </li>
       </ul>
 
