@@ -11,7 +11,9 @@
     <script type="module">
       if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
         console.log("--- DEV ENV ---");
-      } else {
+      } else if (
+        location.href === "https://pkaterski.github.io/leuk_web"
+        || location.href === "https://pkaterski.github.io/leuk_web/") {
         window.location.replace("https://pkaterski.github.io/leuk_web/dist/index.html");
       }
     </script>
