@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import { BloodValues } from './leukLogic/initHealthy';
+import { BloodValueRefs, BloodValues, checkNormalVals } from './leukLogic/initHealthy';
 import { beginBVs, handleIter } from './leukLogic/leuk';
 import { generateEvenlySpread } from './leukLogic/treatment';
 
@@ -24,6 +24,15 @@ function App() {
   useEffect(() => {
     bvsRef.current = bvs;
   }, [bvs]);
+  const [areNormalVals, setAreNormalVals] = useState<BloodValueRefs>({
+    whiteBloodCells: "normal",
+    redBloodCells: "normal",
+    thrombocytes: "normal"
+  });
+  const areNormalValsRef = useRef(areNormalVals);
+  useEffect(() => {
+    areNormalValsRef.current = areNormalVals;
+  }, [areNormalVals]);
 
   useEffect(() => {
 
@@ -37,6 +46,7 @@ function App() {
                         timePassedRef.current,
                         terapyCourses));
 
+      setAreNormalVals(checkNormalVals(bvsRef.current));
     }, 100);
     return () => clearInterval(intervalId);
   }, []);
@@ -50,9 +60,24 @@ function App() {
 
       {/* normal blood cells */}
       <ul>
-        <li>Redbloodcells:<span id="red-blood-cell-count">{bvs.redBloodCells.toFixed()}</span></li>
-        <li>Whitebloodcells:<span id="white-blood-cell-count">{bvs.whiteBloodCells.toFixed()}</span></li>
-        <li>thrombocytes:<span id="thrombocytes-count">{bvs.thrombocytes.toFixed()}</span></li>
+        <li>
+          Redbloodcells:
+          <span id="red-blood-cell-count" className={areNormalVals.redBloodCells === 'normal' ? "" : "critical"}>
+            {bvs.redBloodCells.toFixed()}
+          </span>
+        </li>
+        <li>
+          Whitebloodcells:
+          <span id="white-blood-cell-count" className={areNormalVals.whiteBloodCells === 'normal' ? "" : "critical"}>
+            {bvs.whiteBloodCells.toFixed()}
+          </span>
+        </li>
+        <li>
+          thrombocytes:
+          <span id="thrombocytes-count" className={areNormalVals.thrombocytes === 'normal' ? "" : "critical"}>
+            {bvs.thrombocytes.toFixed()}
+          </span>
+        </li>
       </ul>
 
       <ul>
@@ -72,7 +97,7 @@ function App() {
         <li>drug in action: <span id="drug-in-action">none</span></li>
 
         {/* status */}
-        <li>is alive: <span id="is-alive">{bvs.alive + ''}</span></li>
+        <li>is alive: <span id="is-alive" className={bvs.alive ? "" : "critical"}>{bvs.alive + ''}</span></li>
 
         {/* metadata */}
         <li>
