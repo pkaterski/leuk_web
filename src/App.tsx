@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import { BloodValueRefs, BloodValues, checkNormalVals } from './leukLogic/initHealthy';
-import { beginBVs, handleIter } from './leukLogic/leuk';
+import { BloodValueRefs, BloodValues, checkNormalVals, Drug } from './leukLogic/initHealthy';
+import { beginBVs, getDrugWareOffTime, handleIter } from './leukLogic/leuk';
 import { generateEvenlySpread } from './leukLogic/treatment';
 
 function App() {
@@ -33,6 +33,12 @@ function App() {
   useEffect(() => {
     areNormalValsRef.current = areNormalVals;
   }, [areNormalVals]);
+  const [drugWareOffTime, setDrugWareOffTime] = useState<number | null>(null);
+  const drugWareOffTimeRef = useRef(drugWareOffTime);
+  useEffect(() => {
+    drugWareOffTimeRef.current = drugWareOffTime;
+  }, [drugWareOffTime]);
+  const [drugTimeRemaining, setDrugTimeRemaining] = useState('0');
 
   useEffect(() => {
 
@@ -47,6 +53,20 @@ function App() {
                         terapyCourses));
 
       setAreNormalVals(checkNormalVals(bvsRef.current));
+
+      if (bvsRef.current.drug !== null) {
+        if (drugWareOffTimeRef.current !== null) {
+          const drugTimePassed = timePassedRef.current - bvsRef.current.drug.introductionTime;
+          const timeRemaining = drugWareOffTimeRef.current - drugTimePassed;
+          console.log((timeRemaining / 1000).toFixed(1));
+          setDrugTimeRemaining((timeRemaining / 1000).toFixed(1));
+        } else {
+          setDrugWareOffTime(getDrugWareOffTime(bvsRef.current.drug.type));
+        }
+      } else if (drugWareOffTimeRef.current !== null) {
+        setDrugWareOffTime(null);
+      }
+
     }, 100);
     return () => clearInterval(intervalId);
   }, []);
@@ -94,7 +114,12 @@ function App() {
 
       <ul>
         {/* drug in action */}
-        <li>drug in action: <span id="drug-in-action">none</span></li>
+        <li>
+          drug in action:
+          <span id="drug-in-action">
+            {bvs.drug === null ? "none" : `${bvs.drug.type} (${drugTimeRemaining} s)`}
+          </span>
+        </li>
 
         {/* status */}
         <li>is alive: <span id="is-alive" className={bvs.alive ? "" : "critical"}>{bvs.alive + ''}</span></li>
