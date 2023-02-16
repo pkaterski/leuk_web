@@ -3,10 +3,17 @@ import './App.css'
 import { BloodValueRefs, BloodValues, checkNormalVals } from './leukLogic/initHealthy';
 import { beginBVs, getDrugWareOffTime, handleIter } from './leukLogic/leuk';
 import { generateEvenlySpread, TreatmentCourse } from './leukLogic/treatment';
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
+import TreatmentCoursesMenu from './components/TreatmentCoursesPopup';
 
 function App() {
   const TIME_INTERVAL_MS = 100;
-  const terapyCourses: TreatmentCourse[] = generateEvenlySpread("Alexan", 10000, 4);
+  const [therapyCourses, setTerapyCourses] = useState<TreatmentCourse[]>(generateEvenlySpread("Alexan", 10000, 4))
+  const therapyCoursesRef = useRef(therapyCourses)
+  useEffect(() => {
+    therapyCoursesRef.current = therapyCourses
+  }, [therapyCourses])
 
   const [started, setStarted] = useState(false);
   const [pauseState, setPauseState] = useState(true);
@@ -51,7 +58,7 @@ function App() {
       setTimePassed(t => t + TIME_INTERVAL_MS);
       setBvs(handleIter(bvsRef.current,
                         timePassedRef.current,
-                        terapyCourses));
+                        therapyCoursesRef.current));
 
       setAreNormalVals(checkNormalVals(bvsRef.current));
 
@@ -152,6 +159,15 @@ function App() {
         {!started ? "start" : pauseState ? "resume" : "pause"}
       </button>
       <button type="button" id="alexan-btn" onClick={onIntroduceAlexan}>Introduce Alexan</button>
+      <br />
+      <Popup trigger={<button>Therapy course</button>} modal closeOnDocumentClick={false}>
+        {(close: any) => (
+          <TreatmentCoursesMenu
+            closeFn={close}
+            initialTreatmentCourses={therapyCourses}
+            onTreatmentCoursesChange={(tcs => setTerapyCourses(tcs))} />
+        )}
+      </Popup>
     </div>
     </div>
   )

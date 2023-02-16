@@ -6,3 +6,7 @@
 .critical {
     color: red;
 }
+
+button {
+    margin: 3px;
+}
