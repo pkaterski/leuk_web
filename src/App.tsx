@@ -6,6 +6,7 @@ import { generateEvenlySpread, TreatmentCourse } from './leukLogic/treatment';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import TreatmentCoursesMenu from './components/TreatmentCoursesPopup';
+import Parameters from './components/Parameters';
 
 const initSimParams: SimulationParameters = {
   growthFactors: {
@@ -235,6 +236,11 @@ function App() {
             closeFn={close}
             initialTreatmentCourses={therapyCourses}
             onTreatmentCoursesChange={(tcs => setTerapyCourses(tcs))} />
+        )}
+      </Popup>
+      <Popup trigger={<button>Parameters</button>} modal closeOnDocumentClick={false}>
+        {(close: any) => (
+          <Parameters closeFn={close}></Parameters>
         )}
       </Popup>
     </div>
