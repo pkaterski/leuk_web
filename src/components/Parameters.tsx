@@ -78,7 +78,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
 
     return (
         <div style={{maxHeight: "50vh", overflow: "auto"}}>
-            <h3>Simulation Parameters</h3>
+            <h2>Simulation Parameters</h2>
             <hr />
 
             <label>Leukemic Aggressive Cells Growth Factor:</label>
@@ -99,7 +99,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
                           setLeukemicNonAggressiveGrowth(+e.target.value)} />
             <hr />
 
-            <label>Leukemic Kill Rates:</label>
+            <h4>Leukemic Kill Rates:</h4>
             <br/ >
 
             <label>Of Red Blood Cells: </label>
@@ -130,7 +130,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             {DRUGS.map(drugName => {
                 return (
                     <div key={drugName}>
-                        <label>{drugName} parameters:</label>
+                        <h4>{drugName} parameters:</h4>
                         <br />
 
                         <label>Ware-Off Time: </label>
