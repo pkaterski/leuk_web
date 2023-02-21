@@ -25,7 +25,7 @@ function introduceLeukemia(bvsIn: BloodValues): BloodValues {
 
 export const beginBVs = introduceLeukemia(initBVs);
 
-export const CRITICAL_TIME = 30000;
+// export const CRITICAL_TIME = 30000;
 
 export function getDrugWareOffTime(drug: Drug): number {
   switch (drug) {
@@ -43,10 +43,15 @@ export function getDrugWareOffTime(drug: Drug): number {
 }
 
 // modifies bvs
-function handleDrugAction(bvs: BloodValues, timePassed: number) {
+function handleDrugAction(bvs: BloodValues, timePassed: number, drugActions: DrugAction[]) {
   // handle drug wareoff
   if (bvs.drug !== null) {
-    const wareOffTime = getDrugWareOffTime(bvs.drug.type);
+    const drugName = bvs.drug.type;
+    const drugIndex = drugActions.findIndex(drug => drug.name === drugName);
+    if (drugIndex === -1)
+      throw new Error("Unknown drug used");
+
+    const wareOffTime = drugActions[drugIndex].wareOffTime; // getDrugWareOffTime(bvs.drug.type);
 
     const t0 = bvs.drug.introductionTime;
     const t1 = timePassed;
@@ -57,29 +62,30 @@ function handleDrugAction(bvs: BloodValues, timePassed: number) {
     }
 
     // handle drug action
-    bvs.redBloodCells *= 0.8;
-    bvs.whiteBloodCells *= 0.8;
-    bvs.thrombocytes *= 0.8;
-    bvs.aggressiveLeukemiaCells *= 0.6;
-    bvs.nonAggressiveLeukemiaCells *= 0.8;
+    bvs.redBloodCells *= drugActions[drugIndex].killFactor.redbloodcells; // 0.8;
+    bvs.whiteBloodCells *= drugActions[drugIndex].killFactor.whitebloodcells; // 0.8;
+    bvs.thrombocytes *= drugActions[drugIndex].killFactor.thrombocytes; // 0.8;
+    bvs.aggressiveLeukemiaCells *= drugActions[drugIndex].killFactor.aggressiveleukemiacells; // 0.6;
+    bvs.nonAggressiveLeukemiaCells *= drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells; // 0.8;
   }
 }
 
-function normalizeBloodCells(bvs: BloodValues, checkRefs: BloodValueRefs) {
+function normalizeBloodCells(bvs: BloodValues, checkRefs: BloodValueRefs, normalizationFactor: NormalizationFactor) {
   // handle normalization
   const normalFactor = (r: RefValue) => (r == "high" ? -1 : r == "low" ? 1 : 0);
   // bvs.redBloodCells   += 100000;
   // bvs.whiteBloodCells += 1000;
   // bvs.thrombocytes    += 10000;
-  bvs.redBloodCells *= 1 + normalFactor(checkRefs.redBloodCells) * 0.05;
-  bvs.whiteBloodCells *= 1 + normalFactor(checkRefs.whiteBloodCells) * 0.05;
-  bvs.thrombocytes *= 1 + normalFactor(checkRefs.thrombocytes) * 0.05;
+  bvs.redBloodCells *= 1 + normalFactor(checkRefs.redBloodCells) * normalizationFactor.redBloodCells; // 0.05;
+  bvs.whiteBloodCells *= 1 + normalFactor(checkRefs.whiteBloodCells) * normalizationFactor.whiteBloodCells; // 0.05;
+  bvs.thrombocytes *= 1 + normalFactor(checkRefs.thrombocytes) * normalizationFactor.thrombocytes; // 0.05;
 }
 
 function handleCriticalCondition(
   bvs: BloodValues,
   checkRefs: BloodValueRefs,
-  timePassed: number
+  timePassed: number,
+  criticalTime: number,
 ) {
   const hasCritical = !Object.values(checkRefs).every((v) => v === "normal");
 
@@ -87,36 +93,70 @@ function handleCriticalCondition(
     if (hasCritical) bvs.criticalTimeStart = timePassed;
   } else {
     if (!hasCritical) bvs.criticalTimeStart = null;
-    else if (timePassed - bvs.criticalTimeStart > CRITICAL_TIME)
+    else if (timePassed - bvs.criticalTimeStart > criticalTime)
       bvs.alive = false;
   }
+}
+
+export type DrugAction = {
+  name: Drug;
+  wareOffTime: number;
+  killFactor: {
+    redbloodcells: number;
+    whitebloodcells: number;
+    thrombocytes: number;
+    aggressiveleukemiacells: number;
+    nonAggressiveLeukemiaCells: number;
+  }
+};
+
+export type NormalizationFactor = {
+  redBloodCells: number;
+  whiteBloodCells: number;
+  thrombocytes: number;
+};
+
+export type SimulationParameters = {
+  growthFactors: {
+    leukemicAggressive: number;
+    leukemicNonAggressive: number;
+  };
+  leukemicKillFactor: {
+    redBloodCells: number;
+    whiteBloodCells: number;
+    thrombocytes: number;
+  };
+  drugActions: DrugAction[];
+  normalizationFactor: NormalizationFactor;
+  criticalTime: number;
 }
 
 export function handleIter(
   bvsIn: BloodValues,
   timePassed: number,
-  treatmentCourse: TreatmentCourse[] = []
+  treatmentCourse: TreatmentCourse[] = [],
+  parameters: SimulationParameters,
 ): BloodValues {
   if (!bvsIn.alive) return bvsIn;
 
   const bvs = { ...bvsIn };
 
   // leukemic growth
-  bvs.nonAggressiveLeukemiaCells *= 1.01;
-  bvs.aggressiveLeukemiaCells *= 1.005;
+  bvs.nonAggressiveLeukemiaCells *= parameters.growthFactors.leukemicNonAggressive; // 1.01;
+  bvs.aggressiveLeukemiaCells *= parameters.growthFactors.leukemicAggressive // 1.005;
 
   // leukemic cells kill normal ones
   bvs.redBloodCells = Math.max(
     0,
-    bvs.redBloodCells - bvs.aggressiveLeukemiaCells * 0.2
+    bvs.redBloodCells - bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.redBloodCells // 0.2
   );
   bvs.whiteBloodCells = Math.max(
     0,
-    bvs.whiteBloodCells - bvs.aggressiveLeukemiaCells * 0.2
+    bvs.whiteBloodCells - bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.whiteBloodCells // 0.2
   );
   bvs.thrombocytes = Math.max(
     0,
-    bvs.thrombocytes - bvs.aggressiveLeukemiaCells * 0.2
+    bvs.thrombocytes - bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.thrombocytes // 0.2
   );
 
   let checkRefs = checkNormalVals(bvs);
@@ -131,11 +171,11 @@ export function handleIter(
     };
   }
 
-  handleDrugAction(bvs, timePassed);
-  normalizeBloodCells(bvs, checkRefs);
+  handleDrugAction(bvs, timePassed, parameters.drugActions);
+  normalizeBloodCells(bvs, checkRefs, parameters.normalizationFactor);
 
   checkRefs = checkNormalVals(bvs);
-  handleCriticalCondition(bvs, checkRefs, timePassed);
+  handleCriticalCondition(bvs, checkRefs, timePassed, parameters.criticalTime);
 
   return bvs;
 }

@@ -1,11 +1,75 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { BloodValueRefs, BloodValues, checkNormalVals } from './leukLogic/initHealthy';
-import { beginBVs, getDrugWareOffTime, handleIter } from './leukLogic/leuk';
+import { beginBVs, getDrugWareOffTime, handleIter, SimulationParameters } from './leukLogic/leuk';
 import { generateEvenlySpread, TreatmentCourse } from './leukLogic/treatment';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import TreatmentCoursesMenu from './components/TreatmentCoursesPopup';
+
+const initSimParams: SimulationParameters = {
+  growthFactors: {
+    leukemicAggressive: 1.01,
+    leukemicNonAggressive: 1.005,
+  },
+  leukemicKillFactor: {
+    redBloodCells: 0.2,
+    whiteBloodCells: 0.2,
+    thrombocytes: 0.2,
+  },
+  drugActions: [
+    {
+      name: "Alexan",
+      wareOffTime: 1000,
+      killFactor: {
+        redbloodcells: 0.8,
+        whitebloodcells: 0.8,
+        thrombocytes: 0.8,
+        aggressiveleukemiacells: 0.6,
+        nonAggressiveLeukemiaCells: 0.8,
+      }
+    },
+    {
+      name: "Oncaspar",
+      wareOffTime: 15000,
+      killFactor: {
+        redbloodcells: 0.8,
+        whitebloodcells: 0.8,
+        thrombocytes: 0.8,
+        aggressiveleukemiacells: 0.6,
+        nonAggressiveLeukemiaCells: 0.8,
+      }
+    },
+    {
+      name: "Methotrexate",
+      wareOffTime: 15000,
+      killFactor: {
+        redbloodcells: 0.8,
+        whitebloodcells: 0.8,
+        thrombocytes: 0.8,
+        aggressiveleukemiacells: 0.6,
+        nonAggressiveLeukemiaCells: 0.8,
+      }
+    },
+    {
+      name: "Mercaptopurine",
+      wareOffTime: 15000,
+      killFactor: {
+        redbloodcells: 0.8,
+        whitebloodcells: 0.8,
+        thrombocytes: 0.8,
+        aggressiveleukemiacells: 0.6,
+        nonAggressiveLeukemiaCells: 0.8,
+      }
+    },
+  ],
+  normalizationFactor: {
+    redBloodCells: 0.05,
+    whiteBloodCells: 0.05,
+    thrombocytes: 0.05,
+  },
+  criticalTime: 30000,
+}
 
 function App() {
   const TIME_INTERVAL_MS = 100;
@@ -48,6 +112,8 @@ function App() {
   const [drugTimeRemaining, setDrugTimeRemaining] = useState('0');
   const [criticalTime, setCriticalTime] = useState<string | null>(null);
 
+  const [simParams, setSimParams] = useState<SimulationParameters>(initSimParams);
+
   useEffect(() => {
 
     const intervalId = setInterval(() => {
@@ -56,9 +122,12 @@ function App() {
       }
 
       setTimePassed(t => t + TIME_INTERVAL_MS);
-      setBvs(handleIter(bvsRef.current,
-                        timePassedRef.current,
-                        therapyCoursesRef.current));
+      setBvs(handleIter(
+        bvsRef.current,
+        timePassedRef.current,
+        therapyCoursesRef.current,
+        simParams,
+      ));
 
       setAreNormalVals(checkNormalVals(bvsRef.current));
 
