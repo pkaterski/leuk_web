@@ -183,6 +183,32 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
                                               ...d,
                                               killFactor: {...d.killFactor, thrombocytes: +e.target.value}
                                           } : d))} />
+                        <br />
+
+                        <label>Aggressive Leukemic Cells: </label>
+                        <input
+                            type="number"
+                            min="0"
+                            value={drugActions.find(i => i.name === drugName)?.killFactor.aggressiveleukemiacells}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                      setDrugActions(ds => ds.map(d =>
+                                          d.name === drugName ? {
+                                              ...d,
+                                              killFactor: {...d.killFactor, aggressiveleukemiacells: +e.target.value}
+                                          } : d))} />
+                        <br />
+
+                        <label>Non-Aggressive Leukemic Cells: </label>
+                        <input
+                            type="number"
+                            min="0"
+                            value={drugActions.find(i => i.name === drugName)?.killFactor.nonAggressiveLeukemiaCells}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                      setDrugActions(ds => ds.map(d =>
+                                          d.name === drugName ? {
+                                              ...d,
+                                              killFactor: {...d.killFactor, nonAggressiveLeukemiaCells: +e.target.value}
+                                          } : d))} />
                         <hr />
                     </div>
                 )
