@@ -114,11 +114,15 @@ function App() {
   const [criticalTime, setCriticalTime] = useState<string | null>(null);
 
   const [simParams, setSimParams] = useState<SimulationParameters>(initSimParams);
+  const simParamsRef = useRef(simParams);
+  useEffect(() => {
+    simParamsRef.current = simParams;
+  }, [simParams]);
 
   useEffect(() => {
 
     const intervalId = setInterval(() => {
-      if (pauseStateRef.current) {
+      if (pauseStateRef.current || !bvsRef.current.alive) {
         return;
       }
 
@@ -127,7 +131,7 @@ function App() {
         bvsRef.current,
         timePassedRef.current,
         therapyCoursesRef.current,
-        simParams,
+        simParamsRef.current,
       ));
 
       setAreNormalVals(checkNormalVals(bvsRef.current));
@@ -240,7 +244,11 @@ function App() {
       </Popup>
       <Popup trigger={<button>Parameters</button>} modal closeOnDocumentClick={false}>
         {(close: any) => (
-          <Parameters closeFn={close}></Parameters>
+          <Parameters
+            closeFn={close}
+            initParams={simParams}
+            onParamChange={(newParams: SimulationParameters) => setSimParams(newParams)}
+            />
         )}
       </Popup>
     </div>
