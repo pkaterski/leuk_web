@@ -43,13 +43,16 @@ export function getDrugWareOffTime(drug: Drug): number {
 }
 
 // modifies bvs
-function handleDrugAction(bvs: BloodValues, timePassed: number, drugActions: DrugAction[]) {
+function handleDrugAction(
+  bvs: BloodValues,
+  timePassed: number,
+  drugActions: DrugAction[]
+) {
   // handle drug wareoff
   if (bvs.drug !== null) {
     const drugName = bvs.drug.type;
-    const drugIndex = drugActions.findIndex(drug => drug.name === drugName);
-    if (drugIndex === -1)
-      throw new Error("Unknown drug used");
+    const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
+    if (drugIndex === -1) throw new Error("Unknown drug used");
 
     const wareOffTime = drugActions[drugIndex].wareOffTime; // getDrugWareOffTime(bvs.drug.type);
 
@@ -65,27 +68,39 @@ function handleDrugAction(bvs: BloodValues, timePassed: number, drugActions: Dru
     bvs.redBloodCells *= drugActions[drugIndex].killFactor.redbloodcells; // 0.8;
     bvs.whiteBloodCells *= drugActions[drugIndex].killFactor.whitebloodcells; // 0.8;
     bvs.thrombocytes *= drugActions[drugIndex].killFactor.thrombocytes; // 0.8;
-    bvs.aggressiveLeukemiaCells *= drugActions[drugIndex].killFactor.aggressiveleukemiacells; // 0.6;
-    bvs.nonAggressiveLeukemiaCells *= drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells; // 0.8;
+    bvs.aggressiveLeukemiaCells *=
+      drugActions[drugIndex].killFactor.aggressiveleukemiacells; // 0.6;
+    bvs.nonAggressiveLeukemiaCells *=
+      drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells; // 0.8;
   }
 }
 
-function normalizeBloodCells(bvs: BloodValues, checkRefs: BloodValueRefs, normalizationFactor: NormalizationFactor) {
+function normalizeBloodCells(
+  bvs: BloodValues,
+  checkRefs: BloodValueRefs,
+  normalizationFactor: NormalizationFactor
+) {
   // handle normalization
   const normalFactor = (r: RefValue) => (r == "high" ? -1 : r == "low" ? 1 : 0);
   // bvs.redBloodCells   += 100000;
   // bvs.whiteBloodCells += 1000;
   // bvs.thrombocytes    += 10000;
-  bvs.redBloodCells *= 1 + normalFactor(checkRefs.redBloodCells) * normalizationFactor.redBloodCells; // 0.05;
-  bvs.whiteBloodCells *= 1 + normalFactor(checkRefs.whiteBloodCells) * normalizationFactor.whiteBloodCells; // 0.05;
-  bvs.thrombocytes *= 1 + normalFactor(checkRefs.thrombocytes) * normalizationFactor.thrombocytes; // 0.05;
+  bvs.redBloodCells *=
+    1 +
+    normalFactor(checkRefs.redBloodCells) * normalizationFactor.redBloodCells; // 0.05;
+  bvs.whiteBloodCells *=
+    1 +
+    normalFactor(checkRefs.whiteBloodCells) *
+      normalizationFactor.whiteBloodCells; // 0.05;
+  bvs.thrombocytes *=
+    1 + normalFactor(checkRefs.thrombocytes) * normalizationFactor.thrombocytes; // 0.05;
 }
 
 function handleCriticalCondition(
   bvs: BloodValues,
   checkRefs: BloodValueRefs,
   timePassed: number,
-  criticalTime: number,
+  criticalTime: number
 ) {
   const hasCritical = !Object.values(checkRefs).every((v) => v === "normal");
 
@@ -107,7 +122,7 @@ export type DrugAction = {
     thrombocytes: number;
     aggressiveleukemiacells: number;
     nonAggressiveLeukemiaCells: number;
-  }
+  };
 };
 
 export type NormalizationFactor = {
@@ -129,34 +144,39 @@ export type SimulationParameters = {
   drugActions: DrugAction[];
   normalizationFactor: NormalizationFactor;
   criticalTime: number;
-}
+};
 
 export function handleIter(
   bvsIn: BloodValues,
   timePassed: number,
   treatmentCourse: TreatmentCourse[] = [],
-  parameters: SimulationParameters,
+  parameters: SimulationParameters
 ): BloodValues {
   if (!bvsIn.alive) return bvsIn;
 
   const bvs = { ...bvsIn };
 
   // leukemic growth
-  bvs.nonAggressiveLeukemiaCells *= parameters.growthFactors.leukemicNonAggressive; // 1.01;
-  bvs.aggressiveLeukemiaCells *= parameters.growthFactors.leukemicAggressive // 1.005;
+  bvs.nonAggressiveLeukemiaCells *=
+    parameters.growthFactors.leukemicNonAggressive; // 1.01;
+  bvs.aggressiveLeukemiaCells *= parameters.growthFactors.leukemicAggressive; // 1.005;
 
   // leukemic cells kill normal ones
   bvs.redBloodCells = Math.max(
     0,
-    bvs.redBloodCells - bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.redBloodCells // 0.2
+    bvs.redBloodCells -
+      bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.redBloodCells // 0.2
   );
   bvs.whiteBloodCells = Math.max(
     0,
-    bvs.whiteBloodCells - bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.whiteBloodCells // 0.2
+    bvs.whiteBloodCells -
+      bvs.aggressiveLeukemiaCells *
+        parameters.leukemicKillFactor.whiteBloodCells // 0.2
   );
   bvs.thrombocytes = Math.max(
     0,
-    bvs.thrombocytes - bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.thrombocytes // 0.2
+    bvs.thrombocytes -
+      bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.thrombocytes // 0.2
   );
 
   let checkRefs = checkNormalVals(bvs);

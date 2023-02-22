@@ -10,3 +10,8 @@
 button {
     margin: 3px;
 }
+
+.plot-grid {
+    display: flex;
+    flex-wrap: wrap;
+}

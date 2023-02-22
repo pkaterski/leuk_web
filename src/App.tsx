@@ -1,12 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
-import './App.css'
-import { BloodValueRefs, BloodValues, checkNormalVals } from './leukLogic/initHealthy';
-import { beginBVs, getDrugWareOffTime, handleIter, SimulationParameters } from './leukLogic/leuk';
-import { generateEvenlySpread, TreatmentCourse } from './leukLogic/treatment';
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
-import TreatmentCoursesMenu from './components/TreatmentCoursesPopup';
-import Parameters from './components/Parameters';
+import { useEffect, useRef, useState } from "react";
+import "./App.css";
+import {
+  BloodValueRefs,
+  BloodValues,
+  checkNormalVals,
+} from "./leukLogic/initHealthy";
+import {
+  beginBVs,
+  getDrugWareOffTime,
+  handleIter,
+  SimulationParameters,
+} from "./leukLogic/leuk";
+import { generateEvenlySpread, TreatmentCourse } from "./leukLogic/treatment";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
+import TreatmentCoursesMenu from "./components/TreatmentCoursesPopup";
+import Parameters from "./components/Parameters";
+import PlotComponent from "./components/PlotComponent";
 
 const initSimParams: SimulationParameters = {
   growthFactors: {
@@ -28,7 +38,7 @@ const initSimParams: SimulationParameters = {
         thrombocytes: 0.8,
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
-      }
+      },
     },
     {
       name: "Oncaspar",
@@ -39,7 +49,7 @@ const initSimParams: SimulationParameters = {
         thrombocytes: 0.8,
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
-      }
+      },
     },
     {
       name: "Methotrexate",
@@ -50,7 +60,7 @@ const initSimParams: SimulationParameters = {
         thrombocytes: 0.8,
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
-      }
+      },
     },
     {
       name: "Mercaptopurine",
@@ -61,7 +71,7 @@ const initSimParams: SimulationParameters = {
         thrombocytes: 0.8,
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
-      }
+      },
     },
   ],
   normalizationFactor: {
@@ -70,15 +80,17 @@ const initSimParams: SimulationParameters = {
     thrombocytes: 0.05,
   },
   criticalTime: 30000,
-}
+};
 
 function App() {
   const TIME_INTERVAL_MS = 100;
-  const [therapyCourses, setTerapyCourses] = useState<TreatmentCourse[]>(generateEvenlySpread("Alexan", 10000, 4))
-  const therapyCoursesRef = useRef(therapyCourses)
+  const [therapyCourses, setTerapyCourses] = useState<TreatmentCourse[]>(
+    generateEvenlySpread("Alexan", 10000, 4)
+  );
+  const therapyCoursesRef = useRef(therapyCourses);
   useEffect(() => {
-    therapyCoursesRef.current = therapyCourses
-  }, [therapyCourses])
+    therapyCoursesRef.current = therapyCourses;
+  }, [therapyCourses]);
 
   const [started, setStarted] = useState(false);
   const [pauseState, setPauseState] = useState(true);
@@ -99,7 +111,7 @@ function App() {
   const [areNormalVals, setAreNormalVals] = useState<BloodValueRefs>({
     whiteBloodCells: "normal",
     redBloodCells: "normal",
-    thrombocytes: "normal"
+    thrombocytes: "normal",
   });
   const areNormalValsRef = useRef(areNormalVals);
   useEffect(() => {
@@ -110,35 +122,44 @@ function App() {
   useEffect(() => {
     drugWareOffTimeRef.current = drugWareOffTime;
   }, [drugWareOffTime]);
-  const [drugTimeRemaining, setDrugTimeRemaining] = useState('0');
+  const [drugTimeRemaining, setDrugTimeRemaining] = useState("0");
   const [criticalTime, setCriticalTime] = useState<string | null>(null);
 
-  const [simParams, setSimParams] = useState<SimulationParameters>(initSimParams);
+  const [simParams, setSimParams] =
+    useState<SimulationParameters>(initSimParams);
   const simParamsRef = useRef(simParams);
   useEffect(() => {
     simParamsRef.current = simParams;
   }, [simParams]);
 
-  useEffect(() => {
+  const [bvsAcc, setBvsAcc] = useState<BloodValues[]>([]);
+  const [timePassedAcc, setTimePassedAcc] = useState<number[]>([]);
 
+  useEffect(() => {
     const intervalId = setInterval(() => {
       if (pauseStateRef.current || !bvsRef.current.alive) {
         return;
       }
 
-      setTimePassed(t => t + TIME_INTERVAL_MS);
-      setBvs(handleIter(
+      const newTimePassed = timePassedRef.current + TIME_INTERVAL_MS;
+      setTimePassed(newTimePassed);
+      const newBvs = handleIter(
         bvsRef.current,
         timePassedRef.current,
         therapyCoursesRef.current,
-        simParamsRef.current,
-      ));
+        simParamsRef.current
+      );
+      setBvs(newBvs);
+
+      setBvsAcc((bvss) => [...bvss, newBvs].slice(-600));
+      setTimePassedAcc((ts) => [...ts, newTimePassed].slice(-600));
 
       setAreNormalVals(checkNormalVals(bvsRef.current));
 
       if (bvsRef.current.drug !== null) {
         if (drugWareOffTimeRef.current !== null) {
-          const drugTimePassed = timePassedRef.current - bvsRef.current.drug.introductionTime;
+          const drugTimePassed =
+            timePassedRef.current - bvsRef.current.drug.introductionTime;
           const timeRemaining = drugWareOffTimeRef.current - drugTimePassed;
           console.log((timeRemaining / 1000).toFixed(1));
           setDrugTimeRemaining((timeRemaining / 1000).toFixed(1));
@@ -150,110 +171,191 @@ function App() {
       }
 
       if (bvsRef.current.criticalTimeStart !== null) {
-        setCriticalTime(((timePassedRef.current - bvsRef.current.criticalTimeStart) / 1000).toFixed(1) + " units")
+        setCriticalTime(
+          (
+            (timePassedRef.current - bvsRef.current.criticalTimeStart) /
+            1000
+          ).toFixed(1) + " units"
+        );
       } else {
         setCriticalTime(null);
       }
-
-
     }, 100);
     return () => clearInterval(intervalId);
   }, []);
 
   const onIntroduceAlexan = () => {
     setBvs((bvs) => {
-      return { ...bvs, drug: {type: "Alexan", introductionTime: timePassed} }
+      return { ...bvs, drug: { type: "Alexan", introductionTime: timePassed } };
     });
   };
 
   return (
     <div className="App">
       <div className="container">
-      <h1>Leaukemia</h1>
+        <div className="plot-grid">
+          <div className="main-part">
+            <h1>Leaukemia</h1>
 
-      <h4>Blood values:</h4>
+            <h4>Blood values:</h4>
 
-      {/* normal blood cells */}
-      <ul>
-        <li>
-          Redbloodcells:
-          <span id="red-blood-cell-count" className={areNormalVals.redBloodCells === 'normal' ? "" : "critical"}>
-            {bvs.redBloodCells.toFixed()}
-          </span>
-        </li>
-        <li>
-          Whitebloodcells:
-          <span id="white-blood-cell-count" className={areNormalVals.whiteBloodCells === 'normal' ? "" : "critical"}>
-            {bvs.whiteBloodCells.toFixed()}
-          </span>
-        </li>
-        <li>
-          thrombocytes:
-          <span id="thrombocytes-count" className={areNormalVals.thrombocytes === 'normal' ? "" : "critical"}>
-            {bvs.thrombocytes.toFixed()}
-          </span>
-        </li>
-      </ul>
+            {/* normal blood cells */}
+            <ul>
+              <li>
+                Redbloodcells:
+                <span
+                  id="red-blood-cell-count"
+                  className={
+                    areNormalVals.redBloodCells === "normal" ? "" : "critical"
+                  }
+                >
+                  {bvs.redBloodCells.toFixed()}
+                </span>
+              </li>
+              <li>
+                Whitebloodcells:
+                <span
+                  id="white-blood-cell-count"
+                  className={
+                    areNormalVals.whiteBloodCells === "normal" ? "" : "critical"
+                  }
+                >
+                  {bvs.whiteBloodCells.toFixed()}
+                </span>
+              </li>
+              <li>
+                thrombocytes:
+                <span
+                  id="thrombocytes-count"
+                  className={
+                    areNormalVals.thrombocytes === "normal" ? "" : "critical"
+                  }
+                >
+                  {bvs.thrombocytes.toFixed()}
+                </span>
+              </li>
+            </ul>
 
-      <ul>
-        {/* leukemic cells */}
-        <li>
-          aggressive leukemia cells:
-          <span id="aggressive-leukemia-cell-count">{bvs.aggressiveLeukemiaCells.toFixed()}</span>
-        </li>
-        <li>
-          non-aggressive leukemia cells:
-          <span id="non-aggressive-leukemia-cell-count">{bvs.nonAggressiveLeukemiaCells.toFixed()}</span>
-        </li>
-      </ul>
+            <ul>
+              {/* leukemic cells */}
+              <li>
+                aggressive leukemia cells:
+                <span id="aggressive-leukemia-cell-count">
+                  {bvs.aggressiveLeukemiaCells.toFixed()}
+                </span>
+              </li>
+              <li>
+                non-aggressive leukemia cells:
+                <span id="non-aggressive-leukemia-cell-count">
+                  {bvs.nonAggressiveLeukemiaCells.toFixed()}
+                </span>
+              </li>
+            </ul>
 
-      <ul>
-        {/* drug in action */}
-        <li>
-          drug in action:
-          <span id="drug-in-action">
-            {bvs.drug === null ? "none" : `${bvs.drug.type} (${drugTimeRemaining} s)`}
-          </span>
-        </li>
+            <ul>
+              {/* drug in action */}
+              <li>
+                drug in action:
+                <span id="drug-in-action">
+                  {bvs.drug === null
+                    ? "none"
+                    : `${bvs.drug.type} (${drugTimeRemaining} s)`}
+                </span>
+              </li>
 
-        {/* status */}
-        <li>is alive: <span id="is-alive" className={bvs.alive ? "" : "critical"}>{bvs.alive + ''}</span></li>
+              {/* status */}
+              <li>
+                is alive:{" "}
+                <span id="is-alive" className={bvs.alive ? "" : "critical"}>
+                  {bvs.alive + ""}
+                </span>
+              </li>
 
-        {/* metadata */}
-        <li>
-          (metadata) time since in critical condition:
-          <span id="critical-time" className={criticalTime === null ? "" : "critical"}>
-            {criticalTime !== null ? criticalTime : "0"}
-          </span>
-        </li>
-      </ul>
+              {/* metadata */}
+              <li>
+                (metadata) time since in critical condition:
+                <span
+                  id="critical-time"
+                  className={criticalTime === null ? "" : "critical"}
+                >
+                  {criticalTime !== null ? criticalTime : "0"}
+                </span>
+              </li>
+            </ul>
 
-      {/* buttons */}
-      <button type="button" id="pause-btn" onClick={() => {setPauseState(i => !i); setStarted(true)}}>
-        {!started ? "start" : pauseState ? "resume" : "pause"}
-      </button>
-      <button type="button" id="alexan-btn" onClick={onIntroduceAlexan}>Introduce Alexan</button>
-      <br />
-      <Popup trigger={<button>Therapy course</button>} modal closeOnDocumentClick={false}>
-        {(close: any) => (
-          <TreatmentCoursesMenu
-            closeFn={close}
-            initialTreatmentCourses={therapyCourses}
-            onTreatmentCoursesChange={(tcs => setTerapyCourses(tcs))} />
-        )}
-      </Popup>
-      <Popup trigger={<button>Parameters</button>} modal closeOnDocumentClick={false}>
-        {(close: any) => (
-          <Parameters
-            closeFn={close}
-            initParams={simParams}
-            onParamChange={(newParams: SimulationParameters) => setSimParams(newParams)}
-            />
-        )}
-      </Popup>
+            {/* buttons */}
+            <button
+              type="button"
+              id="pause-btn"
+              onClick={() => {
+                setPauseState((i) => !i);
+                setStarted(true);
+              }}
+            >
+              {!started ? "start" : pauseState ? "resume" : "pause"}
+            </button>
+            <button type="button" id="alexan-btn" onClick={onIntroduceAlexan}>
+              Introduce Alexan
+            </button>
+            <br />
+            <Popup
+              trigger={<button>Therapy course</button>}
+              modal
+              closeOnDocumentClick={false}
+            >
+              {(close: any) => (
+                <TreatmentCoursesMenu
+                  closeFn={close}
+                  initialTreatmentCourses={therapyCourses}
+                  onTreatmentCoursesChange={(tcs) => setTerapyCourses(tcs)}
+                />
+              )}
+            </Popup>
+            <Popup
+              trigger={<button>Parameters</button>}
+              modal
+              closeOnDocumentClick={false}
+            >
+              {(close: any) => (
+                <Parameters
+                  closeFn={close}
+                  initParams={simParams}
+                  onParamChange={(newParams: SimulationParameters) =>
+                    setSimParams(newParams)
+                  }
+                />
+              )}
+            </Popup>
+          </div>
+          <PlotComponent
+            xs={timePassedAcc}
+            ys={bvsAcc.map((bvs) => bvs.redBloodCells)}
+            title="Red Blood Cells"
+          ></PlotComponent>
+          <PlotComponent
+            xs={timePassedAcc}
+            ys={bvsAcc.map((bvs) => bvs.whiteBloodCells)}
+            title="White Blood Cells"
+          ></PlotComponent>
+          <PlotComponent
+            xs={timePassedAcc}
+            ys={bvsAcc.map((bvs) => bvs.thrombocytes)}
+            title="Thrombocytes"
+          ></PlotComponent>
+          <PlotComponent
+            xs={timePassedAcc}
+            ys={bvsAcc.map((bvs) => bvs.aggressiveLeukemiaCells)}
+            title="Aggressive Leukemia Cells"
+          ></PlotComponent>
+          <PlotComponent
+            xs={timePassedAcc}
+            ys={bvsAcc.map((bvs) => bvs.nonAggressiveLeukemiaCells)}
+            title="Non-Aggressive Leukemia Cells"
+          ></PlotComponent>
+        </div>
+      </div>
     </div>
-    </div>
-  )
+  );
 }
 
-export default App
+export default App;
