@@ -17,6 +17,7 @@ import "reactjs-popup/dist/index.css";
 import TreatmentCoursesMenu from "./components/TreatmentCoursesPopup";
 import Parameters from "./components/Parameters";
 import PlotComponent from "./components/PlotComponent";
+import HelpInformation from "./components/HelpInformation";
 
 const initSimParams: SimulationParameters = {
   growthFactors: {
@@ -195,7 +196,7 @@ function App() {
       <div className="container">
         <div className="plot-grid">
           <div className="main-part">
-            <h1>Leaukemia</h1>
+            <h1>Computer Simulation for Leukemia Treatment</h1>
 
             <h4>Blood values:</h4>
 
@@ -326,6 +327,13 @@ function App() {
                 />
               )}
             </Popup>
+            <Popup
+              trigger={<button>Help Information</button>}
+              modal
+              closeOnDocumentClick={false}
+            >
+              {(close: any) => <HelpInformation closeFn={close} />}
+            </Popup>
           </div>
           <PlotComponent
             xs={timePassedAcc}
@@ -353,6 +361,9 @@ function App() {
             title="Non-Aggressive Leukemia Cells"
           ></PlotComponent>
         </div>
+      </div>
+      <div className="footer">
+        <p>Software prototype created by Parashkev Katerski 2021-2023</p>
       </div>
     </div>
   );
