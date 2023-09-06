@@ -24,3 +24,8 @@ button {
     background-color: rgb(214, 214, 214);
     text-align: center;
  }
+
+ #reset-btn {
+    background-color: rgb(195, 52, 52);
+    color: rgb(241, 241, 241);
+ }

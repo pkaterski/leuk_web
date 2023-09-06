@@ -104,7 +104,7 @@ function App() {
   useEffect(() => {
     timePassedRef.current = timePassed;
   }, [timePassed]);
-  const [bvs, setBvs] = useState<PatientState>(beginBVs);
+  const [bvs, setBvs] = useState<PatientState>({ ...beginBVs });
   const bvsRef = useRef(bvs);
   useEffect(() => {
     bvsRef.current = bvs;
@@ -189,6 +189,25 @@ function App() {
     setBvs((bvs) => {
       return { ...bvs, drug: { type: "Alexan", introductionTime: timePassed } };
     });
+  };
+
+  const onReset = () => {
+    setPauseState(true);
+    setStarted(false);
+
+    setBvs(beginBVs);
+    setBvsAcc([]);
+
+    setAreNormalVals({
+      whiteBloodCells: "normal",
+      redBloodCells: "normal",
+      thrombocytes: "normal",
+    });
+
+    setTimePassed(0);
+    setTimePassedAcc([]);
+
+    setCriticalTime(null);
   };
 
   return (
@@ -297,6 +316,9 @@ function App() {
             </button>
             <button type="button" id="alexan-btn" onClick={onIntroduceAlexan}>
               Introduce Alexan
+            </button>
+            <button type="button" id="reset-btn" onClick={onReset}>
+              Reset
             </button>
             <br />
             <Popup
