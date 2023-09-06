@@ -368,6 +368,8 @@ function App() {
               bvs.whiteBloodCells + bvs.aggressiveLeukemiaCells + bvs.nonAggressiveLeukemiaCells
               )}
             title="Total WBC Count"
+            widthFactor={2}
+            heightFactor={2}
           ></PlotComponent>
           <PlotComponent
             xs={timePassedAcc}
