@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import {
   BloodValueRefs,
-  BloodValues,
+  PatientState,
   checkNormalVals,
 } from "./leukLogic/initHealthy";
 import {
@@ -76,9 +76,9 @@ const initSimParams: SimulationParameters = {
     },
   ],
   normalizationFactor: {
-    redBloodCells: 0.05,
-    whiteBloodCells: 0.05,
-    thrombocytes: 0.05,
+    redBloodCells: 235000 / 5,
+    whiteBloodCells: 225 / 5,
+    thrombocytes: 7500 / 5,
   },
   criticalTime: 30000,
 };
@@ -104,7 +104,7 @@ function App() {
   useEffect(() => {
     timePassedRef.current = timePassed;
   }, [timePassed]);
-  const [bvs, setBvs] = useState<BloodValues>(beginBVs);
+  const [bvs, setBvs] = useState<PatientState>(beginBVs);
   const bvsRef = useRef(bvs);
   useEffect(() => {
     bvsRef.current = bvs;
@@ -133,7 +133,7 @@ function App() {
     simParamsRef.current = simParams;
   }, [simParams]);
 
-  const [bvsAcc, setBvsAcc] = useState<BloodValues[]>([]);
+  const [bvsAcc, setBvsAcc] = useState<PatientState[]>([]);
   const [timePassedAcc, setTimePassedAcc] = useState<number[]>([]);
 
   useEffect(() => {
@@ -335,21 +335,28 @@ function App() {
               {(close: any) => <HelpInformation closeFn={close} />}
             </Popup>
           </div>
-          <PlotComponent
+          {/* <PlotComponent
             xs={timePassedAcc}
             ys={bvsAcc.map((bvs) => bvs.redBloodCells)}
             title="Red Blood Cells"
+          ></PlotComponent> */}
+          <PlotComponent
+            xs={timePassedAcc}
+            ys={bvsAcc.map((bvs) =>
+              bvs.whiteBloodCells + bvs.aggressiveLeukemiaCells + bvs.nonAggressiveLeukemiaCells
+              )}
+            title="Total WBC Count"
           ></PlotComponent>
           <PlotComponent
             xs={timePassedAcc}
             ys={bvsAcc.map((bvs) => bvs.whiteBloodCells)}
-            title="White Blood Cells"
+            title="Healthy White Blood Cells"
           ></PlotComponent>
-          <PlotComponent
+          {/* <PlotComponent
             xs={timePassedAcc}
             ys={bvsAcc.map((bvs) => bvs.thrombocytes)}
             title="Thrombocytes"
-          ></PlotComponent>
+          ></PlotComponent> */}
           <PlotComponent
             xs={timePassedAcc}
             ys={bvsAcc.map((bvs) => bvs.aggressiveLeukemiaCells)}

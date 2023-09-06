@@ -1,5 +1,5 @@
 import {
-  BloodValues,
+  PatientState,
   generateHalthyBloodValues,
   checkNormalVals,
   Drug,
@@ -10,9 +10,9 @@ import { TreatmentCourse } from "./treatment";
 
 export { checkNormalVals };
 
-const initBVs: BloodValues = generateHalthyBloodValues();
+const initBVs: PatientState = generateHalthyBloodValues();
 
-function introduceLeukemia(bvsIn: BloodValues): BloodValues {
+function introduceLeukemia(bvsIn: PatientState): PatientState {
   const bvs = { ...bvsIn };
 
   const amtToAdd = 1 * 10 ** 3;
@@ -44,7 +44,7 @@ export function getDrugWareOffTime(drug: Drug): number {
 
 // modifies bvs
 function handleDrugAction(
-  bvs: BloodValues,
+  bvs: PatientState,
   timePassed: number,
   drugActions: DrugAction[]
 ) {
@@ -76,7 +76,7 @@ function handleDrugAction(
 }
 
 function normalizeBloodCells(
-  bvs: BloodValues,
+  bvs: PatientState,
   checkRefs: BloodValueRefs,
   normalizationFactor: NormalizationFactor
 ) {
@@ -85,19 +85,18 @@ function normalizeBloodCells(
   // bvs.redBloodCells   += 100000;
   // bvs.whiteBloodCells += 1000;
   // bvs.thrombocytes    += 10000;
-  bvs.redBloodCells *=
-    1 +
-    normalFactor(checkRefs.redBloodCells) * normalizationFactor.redBloodCells; // 0.05;
-  bvs.whiteBloodCells *=
-    1 +
-    normalFactor(checkRefs.whiteBloodCells) *
-      normalizationFactor.whiteBloodCells; // 0.05;
-  bvs.thrombocytes *=
-    1 + normalFactor(checkRefs.thrombocytes) * normalizationFactor.thrombocytes; // 0.05;
+  bvs.redBloodCells +=
+    normalFactor(checkRefs.redBloodCells) * normalizationFactor.redBloodCells;
+
+  bvs.whiteBloodCells +=
+    normalFactor(checkRefs.whiteBloodCells) * normalizationFactor.whiteBloodCells;
+
+  bvs.thrombocytes +=
+    normalFactor(checkRefs.thrombocytes) * normalizationFactor.thrombocytes;
 }
 
 function handleCriticalCondition(
-  bvs: BloodValues,
+  bvs: PatientState,
   checkRefs: BloodValueRefs,
   timePassed: number,
   criticalTime: number
@@ -147,11 +146,11 @@ export type SimulationParameters = {
 };
 
 export function handleIter(
-  bvsIn: BloodValues,
+  bvsIn: PatientState,
   timePassed: number,
   treatmentCourse: TreatmentCourse[] = [],
   parameters: SimulationParameters
-): BloodValues {
+): PatientState {
   if (!bvsIn.alive) return bvsIn;
 
   const bvs = { ...bvsIn };
@@ -196,6 +195,13 @@ export function handleIter(
 
   checkRefs = checkNormalVals(bvs);
   handleCriticalCondition(bvs, checkRefs, timePassed, parameters.criticalTime);
+
+  // only use whole numbers as values
+  bvs.whiteBloodCells = Math.floor(bvs.whiteBloodCells)
+  bvs.redBloodCells = Math.floor(bvs.redBloodCells)
+  bvs.thrombocytes = Math.floor(bvs.thrombocytes)
+  bvs.aggressiveLeukemiaCells = Math.floor(bvs.aggressiveLeukemiaCells)
+  bvs.nonAggressiveLeukemiaCells = Math.floor(bvs.nonAggressiveLeukemiaCells)
 
   return bvs;
 }

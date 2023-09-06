@@ -6,7 +6,7 @@ export const DRUGS = [
 ] as const;
 export type Drug = typeof DRUGS[number];
 
-export type BloodValues = {
+export type PatientState = {
   whiteBloodCells: number;
   redBloodCells: number;
   thrombocytes: number;
@@ -17,7 +17,7 @@ export type BloodValues = {
   criticalTimeStart: number | null;
 };
 
-const bloodValuesZero: BloodValues = {
+const bloodValuesZero: PatientState = {
   whiteBloodCells: 0, // 4,500 to 11,000 WBCs per microliter
   redBloodCells: 0, // 4.7 to 6.1 million cells per microliter
   thrombocytes: 0, // 150,000 to 450,000 platelets per microliter
@@ -28,7 +28,7 @@ const bloodValuesZero: BloodValues = {
   criticalTimeStart: null,
 };
 
-const initNormalBloodVals = (bvsIn: BloodValues) => {
+const initNormalBloodVals = (bvsIn: PatientState) => {
   const bvs = { ...bvsIn };
   const r = Math.random;
 
@@ -51,7 +51,7 @@ export type BloodValueRefs = {
   thrombocytes: RefValue;
 };
 
-export const checkNormalVals = (bvs: BloodValues): BloodValueRefs => {
+export const checkNormalVals = (bvs: PatientState): BloodValueRefs => {
   const res: BloodValueRefs = {
     whiteBloodCells: "normal",
     redBloodCells: "normal",
@@ -79,7 +79,7 @@ export const checkNormalVals = (bvs: BloodValues): BloodValueRefs => {
   return res;
 };
 
-export const generateHalthyBloodValues: () => BloodValues = () => {
+export const generateHalthyBloodValues: () => PatientState = () => {
   // generate blood values within normal range
   const vals = initNormalBloodVals(bloodValuesZero);
 
