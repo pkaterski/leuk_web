@@ -1,19 +1,19 @@
 import {
-  BloodValues,
+  PatientState,
   generateHalthyBloodValues,
   checkNormalVals,
   Drug,
-  RefValue,
   BloodValueRefs,
 } from "./initHealthy";
 import { TreatmentCourse } from "./treatment";
 
 export { checkNormalVals };
 
-const initBVs: BloodValues = generateHalthyBloodValues();
+const initBVs: PatientState = generateHalthyBloodValues();
 
-function introduceLeukemia(bvsIn: BloodValues): BloodValues {
+function introduceLeukemia(bvsIn: PatientState): PatientState {
   const bvs = { ...bvsIn };
+  return bvsIn;
 
   const amtToAdd = 1 * 10 ** 3;
 
@@ -44,7 +44,7 @@ export function getDrugWareOffTime(drug: Drug): number {
 
 // modifies bvs
 function handleDrugAction(
-  bvs: BloodValues,
+  bvs: PatientState,
   timePassed: number,
   drugActions: DrugAction[]
 ) {
@@ -65,44 +65,55 @@ function handleDrugAction(
     }
 
     // handle drug action
-    bvs.redBloodCells *= drugActions[drugIndex].killFactor.redbloodcells; // 0.8;
-    bvs.whiteBloodCells *= drugActions[drugIndex].killFactor.whitebloodcells; // 0.8;
-    bvs.thrombocytes *= drugActions[drugIndex].killFactor.thrombocytes; // 0.8;
+    bvs.redBloodCells *= 1 - drugActions[drugIndex].killFactor.redbloodcells;
+    bvs.whiteBloodCells *= 1 - drugActions[drugIndex].killFactor.whitebloodcells;
+    bvs.thrombocytes *= 1 - drugActions[drugIndex].killFactor.thrombocytes;
+    bvs.stemCells *= 1 - drugActions[drugIndex].killFactor.stemCells;
     bvs.aggressiveLeukemiaCells *=
-      drugActions[drugIndex].killFactor.aggressiveleukemiacells; // 0.6;
+      1 - drugActions[drugIndex].killFactor.aggressiveleukemiacells;
     bvs.nonAggressiveLeukemiaCells *=
-      drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells; // 0.8;
+      1 - drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells;
   }
 }
 
 function normalizeBloodCells(
-  bvs: BloodValues,
+  bvs: PatientState,
   checkRefs: BloodValueRefs,
   normalizationFactor: NormalizationFactor
 ) {
-  // handle normalization
-  const normalFactor = (r: RefValue) => (r == "high" ? -1 : r == "low" ? 1 : 0);
-  // bvs.redBloodCells   += 100000;
-  // bvs.whiteBloodCells += 1000;
-  // bvs.thrombocytes    += 10000;
-  bvs.redBloodCells *=
-    1 +
-    normalFactor(checkRefs.redBloodCells) * normalizationFactor.redBloodCells; // 0.05;
-  bvs.whiteBloodCells *=
-    1 +
-    normalFactor(checkRefs.whiteBloodCells) *
-      normalizationFactor.whiteBloodCells; // 0.05;
-  bvs.thrombocytes *=
-    1 + normalFactor(checkRefs.thrombocytes) * normalizationFactor.thrombocytes; // 0.05;
+  const stemCellFactor = bvs.stemCells / 125000; // middle of refs 50000 - 200000
+
+  // r but with threshold [-1, 1]
+  const normalFactor = (r: number) => (r < -1 ? -1 : r > 1 ? 1 : r);
+
+  bvs.redBloodCells +=
+    normalFactor(checkRefs.redBloodCells)
+    * normalizationFactor.redBloodCells
+    * stemCellFactor;
+
+  bvs.whiteBloodCells +=
+    normalFactor(checkRefs.whiteBloodCells)
+    * normalizationFactor.whiteBloodCells
+    * stemCellFactor;
+
+  bvs.thrombocytes +=
+    normalFactor(checkRefs.thrombocytes)
+    * normalizationFactor.thrombocytes
+    * stemCellFactor;
+
+    bvs.stemCells +=
+    normalFactor(checkRefs.stemCells) * normalizationFactor.stemCells;
+  // bvs.stemCells *=
+  //   1 + normalFactor(checkRefs.stemCells) * normalizationFactor.stemCells;
 }
 
 function handleCriticalCondition(
-  bvs: BloodValues,
+  bvs: PatientState,
   checkRefs: BloodValueRefs,
   timePassed: number,
   criticalTime: number
 ) {
-  const hasCritical = !Object.values(checkRefs).every((v) => v === "normal");
+  const hasCritical = !Object.values(checkRefs).every((v) => Math.abs(v) <= 1);
 
   if (bvs.criticalTimeStart === null) {
     if (hasCritical) bvs.criticalTimeStart = timePassed;
@@ -120,6 +131,7 @@ export type DrugAction = {
     redbloodcells: number;
     whitebloodcells: number;
     thrombocytes: number;
+    stemCells: number;
     aggressiveleukemiacells: number;
     nonAggressiveLeukemiaCells: number;
   };
@@ -129,6 +141,7 @@ export type NormalizationFactor = {
   redBloodCells: number;
   whiteBloodCells: number;
   thrombocytes: number;
+  stemCells: number;
 };
 
 export type SimulationParameters = {
@@ -140,6 +153,7 @@ export type SimulationParameters = {
     redBloodCells: number;
     whiteBloodCells: number;
     thrombocytes: number;
+    stemCells: number;
   };
   drugActions: DrugAction[];
   normalizationFactor: NormalizationFactor;
@@ -147,19 +161,26 @@ export type SimulationParameters = {
 };
 
 export function handleIter(
-  bvsIn: BloodValues,
+  bvsIn: PatientState,
   timePassed: number,
   treatmentCourse: TreatmentCourse[] = [],
   parameters: SimulationParameters
-): BloodValues {
+): PatientState {
   if (!bvsIn.alive) return bvsIn;
 
   const bvs = { ...bvsIn };
 
+  // normal cells die
+  bvs.whiteBloodCells *= 0.999;
+  bvs.redBloodCells *= 0.999;
+  bvs.thrombocytes *= 0.999;
+  bvs.aggressiveLeukemiaCells *= 0.999;
+  bvs.nonAggressiveLeukemiaCells *= 0.999;
+
   // leukemic growth
   bvs.nonAggressiveLeukemiaCells *=
-    parameters.growthFactors.leukemicNonAggressive; // 1.01;
-  bvs.aggressiveLeukemiaCells *= parameters.growthFactors.leukemicAggressive; // 1.005;
+    parameters.growthFactors.leukemicNonAggressive;
+  bvs.aggressiveLeukemiaCells *= parameters.growthFactors.leukemicAggressive;
 
   // leukemic cells kill normal ones
   bvs.redBloodCells = Math.max(
@@ -177,6 +198,11 @@ export function handleIter(
     0,
     bvs.thrombocytes -
       bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.thrombocytes // 0.2
+  );
+  bvs.stemCells = Math.max(
+    0,
+    bvs.stemCells -
+      bvs.aggressiveLeukemiaCells * parameters.leukemicKillFactor.stemCells
   );
 
   let checkRefs = checkNormalVals(bvs);
@@ -196,6 +222,15 @@ export function handleIter(
 
   checkRefs = checkNormalVals(bvs);
   handleCriticalCondition(bvs, checkRefs, timePassed, parameters.criticalTime);
+
+  // only use whole numbers as values
+  bvs.whiteBloodCells = Math.floor(bvs.whiteBloodCells)
+  bvs.redBloodCells = Math.floor(bvs.redBloodCells)
+  bvs.thrombocytes = Math.floor(bvs.thrombocytes)
+  bvs.aggressiveLeukemiaCells = Math.floor(bvs.aggressiveLeukemiaCells)
+  bvs.nonAggressiveLeukemiaCells = Math.floor(bvs.nonAggressiveLeukemiaCells)
+
+  bvs.stemCells = Math.floor(bvs.stemCells)
 
   return bvs;
 }

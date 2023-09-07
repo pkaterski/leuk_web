@@ -6,21 +6,23 @@ export const DRUGS = [
 ] as const;
 export type Drug = typeof DRUGS[number];
 
-export type BloodValues = {
+export type PatientState = {
   whiteBloodCells: number;
   redBloodCells: number;
   thrombocytes: number;
   aggressiveLeukemiaCells: number;
   nonAggressiveLeukemiaCells: number;
+  stemCells: number;
   drug: { type: Drug; introductionTime: number } | null;
   alive: Boolean;
   criticalTimeStart: number | null;
 };
 
-const bloodValuesZero: BloodValues = {
+const bloodValuesZero: PatientState = {
   whiteBloodCells: 0, // 4,500 to 11,000 WBCs per microliter
   redBloodCells: 0, // 4.7 to 6.1 million cells per microliter
   thrombocytes: 0, // 150,000 to 450,000 platelets per microliter
+  stemCells: 0,
   aggressiveLeukemiaCells: 0,
   nonAggressiveLeukemiaCells: 0,
   drug: null,
@@ -28,7 +30,7 @@ const bloodValuesZero: BloodValues = {
   criticalTimeStart: null,
 };
 
-const initNormalBloodVals = (bvsIn: BloodValues) => {
+const initNormalBloodVals = (bvsIn: PatientState) => {
   const bvs = { ...bvsIn };
   const r = Math.random;
 
@@ -36,50 +38,53 @@ const initNormalBloodVals = (bvsIn: BloodValues) => {
   const rbc = (r() * (6.1 - 4.7) + 4.7) * 10 ** 6;
   const t = (r() * (4.5 - 1.5) + 1.5) * 10 ** 5;
 
+  const stemCells = (r() * (20 - 5) + 5) * 10 ** 4;
+
   bvs.whiteBloodCells = wbc;
   bvs.redBloodCells = rbc;
   bvs.thrombocytes = t;
 
+  bvs.stemCells = stemCells;
+
   return bvs;
 };
 
-export type RefValue = "normal" | "high" | "low";
+// export type RefValue = "normal" | "high" | "low";
 
 export type BloodValueRefs = {
-  whiteBloodCells: RefValue;
-  redBloodCells: RefValue;
-  thrombocytes: RefValue;
+  whiteBloodCells: number; // RefValue;
+  redBloodCells: number; // RefValue;
+  thrombocytes: number; // RefValue;
+  stemCells: number; // RefValue;
 };
 
-export const checkNormalVals = (bvs: BloodValues): BloodValueRefs => {
+export const checkNormalVals = (bvs: PatientState): BloodValueRefs => {
+  // 0 -> normal
+  // < 0 low
+  // > 0 high
   const res: BloodValueRefs = {
-    whiteBloodCells: "normal",
-    redBloodCells: "normal",
-    thrombocytes: "normal",
+    whiteBloodCells: 0,
+    redBloodCells: 0,
+    thrombocytes: 0,
+    stemCells: 0,
   };
 
-  if (bvs.whiteBloodCells < 4500) {
-    res.whiteBloodCells = "low";
-  } else if (bvs.whiteBloodCells > 11000) {
-    res.whiteBloodCells = "high";
-  }
+  res.whiteBloodCells =
+    -(bvs.whiteBloodCells - (11000 + 4500) / 2) / ((11000 - 4500) / 2)
 
-  if (bvs.redBloodCells < 4700000) {
-    res.redBloodCells = "low";
-  } else if (bvs.redBloodCells > 6100000) {
-    res.redBloodCells = "high";
-  }
+  res.redBloodCells =
+    -(bvs.redBloodCells - (6100000 + 4700000) / 2) / ((6100000 - 4700000) / 2)
+  
+  res.thrombocytes =
+    -(bvs.thrombocytes - (450000 + 150000) / 2) / ((450000 - 150000) / 2)
 
-  if (bvs.thrombocytes < 150000) {
-    res.thrombocytes = "low";
-  } else if (bvs.thrombocytes > 450000) {
-    res.thrombocytes = "high";
-  }
+  res.stemCells =
+    -(bvs.stemCells - (200000 + 50000) / 2) / ((200000 - 50000) / 2)
 
   return res;
 };
 
-export const generateHalthyBloodValues: () => BloodValues = () => {
+export const generateHalthyBloodValues: () => PatientState = () => {
   // generate blood values within normal range
   const vals = initNormalBloodVals(bloodValuesZero);
 

@@ -22,8 +22,10 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
     initTcs.sort((a, b) => a.atTime - b.atTime);
     setTreatmentCourses(initTcs);
     const lastTcs = initTcs.slice(-1)[0];
-    setLatestTime(lastTcs.atTime);
-    setSelectedTime(lastTcs.atTime + 100);
+    if (lastTcs !== undefined) {
+      setLatestTime(lastTcs.atTime);
+      setSelectedTime(lastTcs.atTime + 100);
+    }
   }, []);
 
   const handleAddCourse = () => {

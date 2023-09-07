@@ -5,12 +5,15 @@ type BloodValuePlotProps = {
   xs: number[];
   ys: number[];
   title: string;
+  widthFactor?: number;
+  heightFactor?: number;
 };
 
 const PlotComponent: React.FC<BloodValuePlotProps> = (
   props: BloodValuePlotProps
 ) => {
-  const layout = { width: 320, height: 240, title: props.title };
+  const [widthFactor, heightFactor] = [props.widthFactor || 1, props.heightFactor || 1]
+  const layout = { width: 320 * widthFactor, height: 240 * heightFactor, title: props.title };
 
   return (
     <div>
