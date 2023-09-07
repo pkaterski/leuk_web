@@ -25,10 +25,10 @@ const initSimParams: SimulationParameters = {
     leukemicNonAggressive: 1.005,
   },
   leukemicKillFactor: {
-    redBloodCells: 0.2,
-    whiteBloodCells: 0.2,
-    thrombocytes: 0.2,
-    stemCells: 0.2,
+    redBloodCells: 0.01,
+    whiteBloodCells: 0.01,
+    thrombocytes: 0.01,
+    stemCells: 0.01,
   },
   drugActions: [
     {
@@ -179,7 +179,7 @@ function App() {
         const drugTimePassed =
           timePassedRef.current - bvsRef.current.drug.introductionTime;
         const timeRemaining = drugWareOffTimeRef.current - drugTimePassed;
-        console.log((timeRemaining / 1000).toFixed(1));
+        // console.log((timeRemaining / 1000).toFixed(1));
         setDrugTimeRemaining((timeRemaining / 1000).toFixed(1));
       } else {
         setDrugWareOffTime(getDrugWareOffTime(bvsRef.current.drug.type));

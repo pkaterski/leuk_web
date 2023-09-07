@@ -13,7 +13,7 @@ const initBVs: PatientState = generateHalthyBloodValues();
 
 function introduceLeukemia(bvsIn: PatientState): PatientState {
   const bvs = { ...bvsIn };
-  return bvsIn;
+  // return bvsIn;
 
   const amtToAdd = 1 * 10 ** 3;
 
@@ -178,9 +178,21 @@ export function handleIter(
   bvs.nonAggressiveLeukemiaCells *= 0.999;
 
   // leukemic growth
-  bvs.nonAggressiveLeukemiaCells *=
-    parameters.growthFactors.leukemicNonAggressive;
-  bvs.aggressiveLeukemiaCells *= parameters.growthFactors.leukemicAggressive;
+  if (bvs.drug === null) {
+    bvs.nonAggressiveLeukemiaCells *=
+      parameters.growthFactors.leukemicNonAggressive;
+    bvs.aggressiveLeukemiaCells *= parameters.growthFactors.leukemicAggressive;
+
+    // when population is low cells should devide
+    if (bvs.aggressiveLeukemiaCells !== 0)
+    bvs.aggressiveLeukemiaCells += 1
+
+    if (bvs.nonAggressiveLeukemiaCells !== 0)
+      bvs.nonAggressiveLeukemiaCells += 1
+
+    if (bvs.stemCells !== 0)
+      bvs.stemCells += 1
+  }
 
   // leukemic cells kill normal ones
   bvs.redBloodCells = Math.max(
@@ -210,7 +222,7 @@ export function handleIter(
   // administer drugs
   const index = treatmentCourse.findIndex((i) => i.atTime === timePassed);
   if (index !== -1) {
-    console.log(`drug administered at ${timePassed}`);
+    // console.log(`drug administered at ${timePassed}`);
     bvs.drug = {
       type: treatmentCourse[index].drug,
       introductionTime: timePassed,
@@ -223,14 +235,17 @@ export function handleIter(
   checkRefs = checkNormalVals(bvs);
   handleCriticalCondition(bvs, checkRefs, timePassed, parameters.criticalTime);
 
-  // only use whole numbers as values
-  bvs.whiteBloodCells = Math.floor(bvs.whiteBloodCells)
-  bvs.redBloodCells = Math.floor(bvs.redBloodCells)
-  bvs.thrombocytes = Math.floor(bvs.thrombocytes)
-  bvs.aggressiveLeukemiaCells = Math.floor(bvs.aggressiveLeukemiaCells)
-  bvs.nonAggressiveLeukemiaCells = Math.floor(bvs.nonAggressiveLeukemiaCells)
-
-  bvs.stemCells = Math.floor(bvs.stemCells)
+  bvsMakeWhole(bvs);
 
   return bvs;
+}
+
+function bvsMakeWhole(bvs: PatientState) {
+    // only use whole numbers as values
+    bvs.whiteBloodCells = Math.floor(bvs.whiteBloodCells);
+    bvs.redBloodCells = Math.floor(bvs.redBloodCells);
+    bvs.thrombocytes = Math.floor(bvs.thrombocytes);
+    bvs.aggressiveLeukemiaCells = Math.floor(bvs.aggressiveLeukemiaCells);
+    bvs.nonAggressiveLeukemiaCells = Math.floor(bvs.nonAggressiveLeukemiaCells);
+    bvs.stemCells = Math.floor(bvs.stemCells);
 }
