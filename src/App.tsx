@@ -28,17 +28,19 @@ const initSimParams: SimulationParameters = {
     redBloodCells: 0.2,
     whiteBloodCells: 0.2,
     thrombocytes: 0.2,
+    stemCells: 0.2,
   },
   drugActions: [
     {
       name: "Alexan",
       wareOffTime: 1000,
       killFactor: {
-        redbloodcells: 0.8,
-        whitebloodcells: 0.8,
-        thrombocytes: 0.8,
-        aggressiveleukemiacells: 0.6,
-        nonAggressiveLeukemiaCells: 0.8,
+        redbloodcells: 0.2,
+        whitebloodcells: 0.2,
+        thrombocytes: 0.2,
+        stemCells: 0.1,
+        aggressiveleukemiacells: 0.4,
+        nonAggressiveLeukemiaCells: 0.2,
       },
     },
     {
@@ -48,6 +50,7 @@ const initSimParams: SimulationParameters = {
         redbloodcells: 0.8,
         whitebloodcells: 0.8,
         thrombocytes: 0.8,
+        stemCells: 0.8,
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
       },
@@ -59,6 +62,7 @@ const initSimParams: SimulationParameters = {
         redbloodcells: 0.8,
         whitebloodcells: 0.8,
         thrombocytes: 0.8,
+        stemCells: 0.8,
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
       },
@@ -70,6 +74,7 @@ const initSimParams: SimulationParameters = {
         redbloodcells: 0.8,
         whitebloodcells: 0.8,
         thrombocytes: 0.8,
+        stemCells: 0.8,
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
       },
@@ -79,14 +84,26 @@ const initSimParams: SimulationParameters = {
     redBloodCells: 235000 / 5,
     whiteBloodCells: 225 / 5,
     thrombocytes: 7500 / 5,
+    stemCells: 2500 / 5,
   },
   criticalTime: 30000,
 };
 
 function App() {
   const TIME_INTERVAL_MS = 100;
+  const [simulationSpeed, setSimulationSpeed] = useState<number>(100);
+  const simulationSpeedRef = useRef(simulationSpeed);
+  useEffect(() => {
+    simulationSpeedRef.current = simulationSpeed;
+  }, [simulationSpeed]);
+  const [currentInterval, setCurrentInterval] = useState<NodeJS.Timer | null>(null);
+  const currentIntervalRef = useRef(currentInterval);
+  useEffect(() => {
+    currentIntervalRef.current = currentInterval;
+  }, [currentInterval]);
   const [therapyCourses, setTerapyCourses] = useState<TreatmentCourse[]>(
-    generateEvenlySpread("Alexan", 10000, 4)
+    // generateEvenlySpread("Alexan", 10000, 4)
+    []
   );
   const therapyCoursesRef = useRef(therapyCourses);
   useEffect(() => {
@@ -113,6 +130,7 @@ function App() {
     whiteBloodCells: "normal",
     redBloodCells: "normal",
     thrombocytes: "normal",
+    stemCells: "normal",
   });
   const areNormalValsRef = useRef(areNormalVals);
   useEffect(() => {
@@ -136,54 +154,61 @@ function App() {
   const [bvsAcc, setBvsAcc] = useState<PatientState[]>([]);
   const [timePassedAcc, setTimePassedAcc] = useState<number[]>([]);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (pauseStateRef.current || !bvsRef.current.alive) {
-        return;
-      }
+  const simulationLoop = () => {
+    if (pauseStateRef.current || !bvsRef.current.alive) {
+      return;
+    }
 
-      const newTimePassed = timePassedRef.current + TIME_INTERVAL_MS;
-      setTimePassed(newTimePassed);
-      const newBvs = handleIter(
-        bvsRef.current,
-        timePassedRef.current,
-        therapyCoursesRef.current,
-        simParamsRef.current
-      );
-      setBvs(newBvs);
+    const newTimePassed = timePassedRef.current + TIME_INTERVAL_MS;
+    setTimePassed(newTimePassed);
+    const newBvs = handleIter(
+      bvsRef.current,
+      timePassedRef.current,
+      therapyCoursesRef.current,
+      simParamsRef.current
+    );
+    setBvs(newBvs);
 
-      setBvsAcc((bvss) => [...bvss, newBvs].slice(-600));
-      setTimePassedAcc((ts) => [...ts, newTimePassed].slice(-600));
+    setBvsAcc((bvss) => [...bvss, newBvs].slice(-600));
+    setTimePassedAcc((ts) => [...ts, newTimePassed].slice(-600));
 
-      setAreNormalVals(checkNormalVals(bvsRef.current));
+    setAreNormalVals(checkNormalVals(bvsRef.current));
 
-      if (bvsRef.current.drug !== null) {
-        if (drugWareOffTimeRef.current !== null) {
-          const drugTimePassed =
-            timePassedRef.current - bvsRef.current.drug.introductionTime;
-          const timeRemaining = drugWareOffTimeRef.current - drugTimePassed;
-          console.log((timeRemaining / 1000).toFixed(1));
-          setDrugTimeRemaining((timeRemaining / 1000).toFixed(1));
-        } else {
-          setDrugWareOffTime(getDrugWareOffTime(bvsRef.current.drug.type));
-        }
-      } else if (drugWareOffTimeRef.current !== null) {
-        setDrugWareOffTime(null);
-      }
-
-      if (bvsRef.current.criticalTimeStart !== null) {
-        setCriticalTime(
-          (
-            (timePassedRef.current - bvsRef.current.criticalTimeStart) /
-            1000
-          ).toFixed(1) + " units"
-        );
+    if (bvsRef.current.drug !== null) {
+      if (drugWareOffTimeRef.current !== null) {
+        const drugTimePassed =
+          timePassedRef.current - bvsRef.current.drug.introductionTime;
+        const timeRemaining = drugWareOffTimeRef.current - drugTimePassed;
+        console.log((timeRemaining / 1000).toFixed(1));
+        setDrugTimeRemaining((timeRemaining / 1000).toFixed(1));
       } else {
-        setCriticalTime(null);
+        setDrugWareOffTime(getDrugWareOffTime(bvsRef.current.drug.type));
       }
-    }, 100);
+    } else if (drugWareOffTimeRef.current !== null) {
+      setDrugWareOffTime(null);
+    }
+
+    if (bvsRef.current.criticalTimeStart !== null) {
+      setCriticalTime(
+        (
+          (timePassedRef.current - bvsRef.current.criticalTimeStart) /
+          1000
+        ).toFixed(1) + " units"
+      );
+    } else {
+      setCriticalTime(null);
+    }
+  }
+
+  useEffect(() => {
+    if (currentIntervalRef.current !== null)
+      clearInterval(currentIntervalRef.current);
+
+    const intervalId = setInterval(simulationLoop, TIME_INTERVAL_MS / simulationSpeedRef.current * 100);
+    setCurrentInterval(intervalId);
+
     return () => clearInterval(intervalId);
-  }, []);
+  }, [simulationSpeed]);
 
   const onIntroduceAlexan = () => {
     setBvs((bvs) => {
@@ -202,6 +227,7 @@ function App() {
       whiteBloodCells: "normal",
       redBloodCells: "normal",
       thrombocytes: "normal",
+      stemCells: "normal",
     });
 
     setTimePassed(0);
@@ -321,6 +347,19 @@ function App() {
               Reset
             </button>
             <br />
+
+            <label>Simulation Speed:</label>
+            <input
+              type="number"
+              min="1"
+              value={simulationSpeed}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSimulationSpeed(+e.target.value)
+              }
+            />
+            <br />
+
+            <br />
             <Popup
               trigger={<button>Therapy course</button>}
               modal
@@ -375,6 +414,11 @@ function App() {
             xs={timePassedAcc}
             ys={bvsAcc.map((bvs) => bvs.whiteBloodCells)}
             title="Healthy White Blood Cells"
+          ></PlotComponent>
+          <PlotComponent
+            xs={timePassedAcc}
+            ys={bvsAcc.map((bvs) => bvs.stemCells)}
+            title="Stem Cells"
           ></PlotComponent>
           {/* <PlotComponent
             xs={timePassedAcc}

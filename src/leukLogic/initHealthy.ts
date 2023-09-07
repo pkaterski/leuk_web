@@ -12,6 +12,7 @@ export type PatientState = {
   thrombocytes: number;
   aggressiveLeukemiaCells: number;
   nonAggressiveLeukemiaCells: number;
+  stemCells: number;
   drug: { type: Drug; introductionTime: number } | null;
   alive: Boolean;
   criticalTimeStart: number | null;
@@ -21,6 +22,7 @@ const bloodValuesZero: PatientState = {
   whiteBloodCells: 0, // 4,500 to 11,000 WBCs per microliter
   redBloodCells: 0, // 4.7 to 6.1 million cells per microliter
   thrombocytes: 0, // 150,000 to 450,000 platelets per microliter
+  stemCells: 0,
   aggressiveLeukemiaCells: 0,
   nonAggressiveLeukemiaCells: 0,
   drug: null,
@@ -36,9 +38,13 @@ const initNormalBloodVals = (bvsIn: PatientState) => {
   const rbc = (r() * (6.1 - 4.7) + 4.7) * 10 ** 6;
   const t = (r() * (4.5 - 1.5) + 1.5) * 10 ** 5;
 
+  const stemCells = (r() * (20 - 5) + 5) * 10 ** 4;
+
   bvs.whiteBloodCells = wbc;
   bvs.redBloodCells = rbc;
   bvs.thrombocytes = t;
+
+  bvs.stemCells = stemCells;
 
   return bvs;
 };
@@ -49,6 +55,7 @@ export type BloodValueRefs = {
   whiteBloodCells: RefValue;
   redBloodCells: RefValue;
   thrombocytes: RefValue;
+  stemCells: RefValue;
 };
 
 export const checkNormalVals = (bvs: PatientState): BloodValueRefs => {
@@ -56,6 +63,7 @@ export const checkNormalVals = (bvs: PatientState): BloodValueRefs => {
     whiteBloodCells: "normal",
     redBloodCells: "normal",
     thrombocytes: "normal",
+    stemCells: "normal",
   };
 
   if (bvs.whiteBloodCells < 4500) {
@@ -74,6 +82,12 @@ export const checkNormalVals = (bvs: PatientState): BloodValueRefs => {
     res.thrombocytes = "low";
   } else if (bvs.thrombocytes > 450000) {
     res.thrombocytes = "high";
+  }
+
+  if (bvs.stemCells < 50000) {
+    res.stemCells = "low";
+  } else if (bvs.stemCells > 200000) {
+    res.stemCells = "high";
   }
 
   return res;

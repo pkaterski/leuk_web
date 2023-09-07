@@ -16,6 +16,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
   const [killRBC, setKillRBC] = useState(0);
   const [killWBC, setKillWBC] = useState(0);
   const [killT, setKillT] = useState(0);
+  const [killStem, setKillSteam] = useState(0);
 
   const initDrugActions = DRUGS.map((drugName) => {
     return {
@@ -25,6 +26,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
         redbloodcells: 0,
         whitebloodcells: 0,
         thrombocytes: 0,
+        stemCells: 0,
         aggressiveleukemiacells: 0,
         nonAggressiveLeukemiaCells: 0,
       },
@@ -36,6 +38,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
   const [rbcNormalization, setRbcNormalization] = useState(0);
   const [wbcNormalization, setWbcNormalization] = useState(0);
   const [tNormalization, setTNormalization] = useState(0);
+  const [stemNormalization, setStemNormalization] = useState(0);
 
   const [criticalTime, setCriticalTime] = useState(0);
 
@@ -49,10 +52,12 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
     setKillRBC(props.initParams.leukemicKillFactor.redBloodCells);
     setKillWBC(props.initParams.leukemicKillFactor.whiteBloodCells);
     setKillT(props.initParams.leukemicKillFactor.thrombocytes);
+    setKillSteam(props.initParams.leukemicKillFactor.stemCells);
     setDrugActions(props.initParams.drugActions);
     setRbcNormalization(props.initParams.normalizationFactor.redBloodCells);
     setWbcNormalization(props.initParams.normalizationFactor.whiteBloodCells);
     setTNormalization(props.initParams.normalizationFactor.thrombocytes);
+    setStemNormalization(props.initParams.normalizationFactor.stemCells);
     setCriticalTime(props.initParams.criticalTime);
   };
 
@@ -70,12 +75,14 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
         redBloodCells: killRBC,
         whiteBloodCells: killWBC,
         thrombocytes: killT,
+        stemCells: killStem,
       },
       drugActions,
       normalizationFactor: {
         redBloodCells: rbcNormalization,
         whiteBloodCells: wbcNormalization,
         thrombocytes: tNormalization,
+        stemCells: stemNormalization,
       },
       criticalTime,
     };
@@ -143,6 +150,17 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
           setKillT(+e.target.value)
         }
       />
+      <br />
+      <label>Of Stem Cells: </label>
+      <input
+        type="number"
+        min="0"
+        value={killStem}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setKillSteam(+e.target.value)
+        }
+      />
+      <br />
       <hr />
 
       {DRUGS.map((drugName) => {
@@ -249,6 +267,32 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             />
             <br />
 
+            <label>Stem Cells: </label>
+            <input
+              type="number"
+              min="0"
+              value={
+                drugActions.find((i) => i.name === drugName)?.killFactor
+                  .stemCells
+              }
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDrugActions((ds) =>
+                  ds.map((d) =>
+                    d.name === drugName
+                      ? {
+                          ...d,
+                          killFactor: {
+                            ...d.killFactor,
+                            stemCells: +e.target.value,
+                          },
+                        }
+                      : d
+                  )
+                )
+              }
+            />
+            <br />
+
             <label>Aggressive Leukemic Cells: </label>
             <input
               type="number"
@@ -333,6 +377,17 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
         value={tNormalization}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setTNormalization(+e.target.value)
+        }
+      />
+      <hr />
+
+      <label>Stem Cell Normalization Factor: </label>
+      <input
+        type="number"
+        min="0"
+        value={stemNormalization}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setStemNormalization(+e.target.value)
         }
       />
       <hr />
