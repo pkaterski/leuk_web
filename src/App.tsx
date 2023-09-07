@@ -24,6 +24,10 @@ const initSimParams: SimulationParameters = {
     leukemicAggressive: 1.01,
     leukemicNonAggressive: 1.005,
   },
+  conversionFactors: {
+    leukemicAggressiveToNonAggressive: 0.01,
+    leukemicNonAggressiveToAggressive: 0.01,
+  },
   leukemicKillFactor: {
     redBloodCells: 0.01,
     whiteBloodCells: 0.01,

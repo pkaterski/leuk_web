@@ -13,6 +13,10 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
   const [leukemicAggressiveGrowth, setLeukemicAggressiveGrowth] = useState(0);
   const [leukemicNonAggressiveGrowth, setLeukemicNonAggressiveGrowth] =
     useState(0);
+
+  const [conversionLAtoLNA, setConversionLAtoLNA] = useState(0);
+  const [conversionLNAtoLA, setConversionLNAtoLA] = useState(0);
+
   const [killRBC, setKillRBC] = useState(0);
   const [killWBC, setKillWBC] = useState(0);
   const [killT, setKillT] = useState(0);
@@ -49,6 +53,12 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
     setLeukemicNonAggressiveGrowth(
       props.initParams.growthFactors.leukemicNonAggressive
     );
+    setConversionLAtoLNA(
+      props.initParams.conversionFactors.leukemicAggressiveToNonAggressive
+    );
+    setConversionLNAtoLA(
+      props.initParams.conversionFactors.leukemicNonAggressiveToAggressive
+    );
     setKillRBC(props.initParams.leukemicKillFactor.redBloodCells);
     setKillWBC(props.initParams.leukemicKillFactor.whiteBloodCells);
     setKillT(props.initParams.leukemicKillFactor.thrombocytes);
@@ -70,6 +80,10 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
       growthFactors: {
         leukemicAggressive: leukemicAggressiveGrowth,
         leukemicNonAggressive: leukemicNonAggressiveGrowth,
+      },
+      conversionFactors: {
+        leukemicAggressiveToNonAggressive: conversionLAtoLNA,
+        leukemicNonAggressiveToAggressive: conversionLNAtoLA,
       },
       leukemicKillFactor: {
         redBloodCells: killRBC,
@@ -114,6 +128,29 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
         value={leukemicNonAggressiveGrowth}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setLeukemicNonAggressiveGrowth(+e.target.value)
+        }
+      />
+      <hr />
+
+      <h4>Leukemic Conversion Factors:</h4>
+      <br />
+      <label>Of Non-Aggressive to Aggressive: </label>
+      <input
+        type="number"
+        min="0"
+        value={conversionLNAtoLA}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setConversionLNAtoLA(+e.target.value)
+        }
+      />
+      <br />
+      <label>Of Aggressive to Non-Aggressive: </label>
+      <input
+        type="number"
+        min="0"
+        value={conversionLAtoLNA}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setConversionLAtoLNA(+e.target.value)
         }
       />
       <hr />

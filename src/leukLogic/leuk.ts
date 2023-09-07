@@ -149,6 +149,10 @@ export type SimulationParameters = {
     leukemicAggressive: number;
     leukemicNonAggressive: number;
   };
+  conversionFactors: {
+    leukemicAggressiveToNonAggressive: number;
+    leukemicNonAggressiveToAggressive: number;
+  };
   leukemicKillFactor: {
     redBloodCells: number;
     whiteBloodCells: number;
@@ -193,6 +197,15 @@ export function handleIter(
     if (bvs.stemCells !== 0)
       bvs.stemCells += 1
   }
+
+  // non-aggressive can turn aggressive and vice versa
+  bvs.aggressiveLeukemiaCells +=
+    bvs.nonAggressiveLeukemiaCells
+    * parameters.conversionFactors.leukemicNonAggressiveToAggressive;
+
+  bvs.nonAggressiveLeukemiaCells +=
+    bvs.aggressiveLeukemiaCells
+    * parameters.conversionFactors.leukemicAggressiveToNonAggressive;
 
   // leukemic cells kill normal ones
   bvs.redBloodCells = Math.max(
