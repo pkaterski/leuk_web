@@ -252,7 +252,7 @@ function App() {
             {/* normal blood cells */}
             <ul>
               <li>
-                Redbloodcells:
+                Red Blood Cells:
                 <span
                   id="red-blood-cell-count"
                   className={
@@ -263,7 +263,7 @@ function App() {
                 </span>
               </li>
               <li>
-                Whitebloodcells:
+                White Blood Cells:
                 <span
                   id="white-blood-cell-count"
                   className={
@@ -274,7 +274,7 @@ function App() {
                 </span>
               </li>
               <li>
-                thrombocytes:
+                Thrombocytes:
                 <span
                   id="thrombocytes-count"
                   className={
@@ -282,6 +282,17 @@ function App() {
                   }
                 >
                   {bvs.thrombocytes.toFixed()}
+                </span>
+              </li>
+              <li>
+                Stem Cells:
+                <span
+                  id="stem-cells-count"
+                  className={
+                    Math.abs(areNormalVals.stemCells) <= 1 ? "" : "critical"
+                  }
+                >
+                  {bvs.stemCells.toFixed()}
                 </span>
               </li>
             </ul>
