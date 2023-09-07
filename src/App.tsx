@@ -127,10 +127,10 @@ function App() {
     bvsRef.current = bvs;
   }, [bvs]);
   const [areNormalVals, setAreNormalVals] = useState<BloodValueRefs>({
-    whiteBloodCells: "normal",
-    redBloodCells: "normal",
-    thrombocytes: "normal",
-    stemCells: "normal",
+    whiteBloodCells: 0,
+    redBloodCells: 0,
+    thrombocytes: 0,
+    stemCells: 0,
   });
   const areNormalValsRef = useRef(areNormalVals);
   useEffect(() => {
@@ -224,10 +224,10 @@ function App() {
     setBvsAcc([]);
 
     setAreNormalVals({
-      whiteBloodCells: "normal",
-      redBloodCells: "normal",
-      thrombocytes: "normal",
-      stemCells: "normal",
+      whiteBloodCells: 0,
+      redBloodCells: 0,
+      thrombocytes: 0,
+      stemCells: 0,
     });
 
     setTimePassed(0);
@@ -252,7 +252,7 @@ function App() {
                 <span
                   id="red-blood-cell-count"
                   className={
-                    areNormalVals.redBloodCells === "normal" ? "" : "critical"
+                    Math.abs(areNormalVals.redBloodCells) <= 1 ? "" : "critical"
                   }
                 >
                   {bvs.redBloodCells.toFixed()}
@@ -263,7 +263,7 @@ function App() {
                 <span
                   id="white-blood-cell-count"
                   className={
-                    areNormalVals.whiteBloodCells === "normal" ? "" : "critical"
+                    Math.abs(areNormalVals.whiteBloodCells) <= 1 ? "" : "critical"
                   }
                 >
                   {bvs.whiteBloodCells.toFixed()}
@@ -274,7 +274,7 @@ function App() {
                 <span
                   id="thrombocytes-count"
                   className={
-                    areNormalVals.thrombocytes === "normal" ? "" : "critical"
+                    Math.abs(areNormalVals.thrombocytes) <= 1 ? "" : "critical"
                   }
                 >
                   {bvs.thrombocytes.toFixed()}

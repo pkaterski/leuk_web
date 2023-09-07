@@ -49,46 +49,37 @@ const initNormalBloodVals = (bvsIn: PatientState) => {
   return bvs;
 };
 
-export type RefValue = "normal" | "high" | "low";
+// export type RefValue = "normal" | "high" | "low";
 
 export type BloodValueRefs = {
-  whiteBloodCells: RefValue;
-  redBloodCells: RefValue;
-  thrombocytes: RefValue;
-  stemCells: RefValue;
+  whiteBloodCells: number; // RefValue;
+  redBloodCells: number; // RefValue;
+  thrombocytes: number; // RefValue;
+  stemCells: number; // RefValue;
 };
 
 export const checkNormalVals = (bvs: PatientState): BloodValueRefs => {
+  // 0 -> normal
+  // < 0 low
+  // > 0 high
   const res: BloodValueRefs = {
-    whiteBloodCells: "normal",
-    redBloodCells: "normal",
-    thrombocytes: "normal",
-    stemCells: "normal",
+    whiteBloodCells: 0,
+    redBloodCells: 0,
+    thrombocytes: 0,
+    stemCells: 0,
   };
 
-  if (bvs.whiteBloodCells < 4500) {
-    res.whiteBloodCells = "low";
-  } else if (bvs.whiteBloodCells > 11000) {
-    res.whiteBloodCells = "high";
-  }
+  res.whiteBloodCells =
+    -(bvs.whiteBloodCells - (11000 + 4500) / 2) / ((11000 - 4500) / 2)
 
-  if (bvs.redBloodCells < 4700000) {
-    res.redBloodCells = "low";
-  } else if (bvs.redBloodCells > 6100000) {
-    res.redBloodCells = "high";
-  }
+  res.redBloodCells =
+    -(bvs.redBloodCells - (6100000 + 4700000) / 2) / ((6100000 - 4700000) / 2)
+  
+  res.thrombocytes =
+    -(bvs.thrombocytes - (450000 + 150000) / 2) / ((450000 - 150000) / 2)
 
-  if (bvs.thrombocytes < 150000) {
-    res.thrombocytes = "low";
-  } else if (bvs.thrombocytes > 450000) {
-    res.thrombocytes = "high";
-  }
-
-  if (bvs.stemCells < 50000) {
-    res.stemCells = "low";
-  } else if (bvs.stemCells > 200000) {
-    res.stemCells = "high";
-  }
+  res.stemCells =
+    -(bvs.stemCells - (200000 + 50000) / 2) / ((200000 - 50000) / 2)
 
   return res;
 };

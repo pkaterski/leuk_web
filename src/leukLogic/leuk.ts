@@ -3,7 +3,6 @@ import {
   generateHalthyBloodValues,
   checkNormalVals,
   Drug,
-  RefValue,
   BloodValueRefs,
 } from "./initHealthy";
 import { TreatmentCourse } from "./treatment";
@@ -84,7 +83,8 @@ function normalizeBloodCells(
 ) {
   const stemCellFactor = bvs.stemCells / 125000; // middle of refs 50000 - 200000
 
-  const normalFactor = (r: RefValue) => (r == "high" ? -1 : r == "low" ? 1 : 0);
+  // r but with threshold [-1, 1]
+  const normalFactor = (r: number) => (r < -1 ? -1 : r > 1 ? 1 : r);
 
   bvs.redBloodCells +=
     normalFactor(checkRefs.redBloodCells)
@@ -101,8 +101,10 @@ function normalizeBloodCells(
     * normalizationFactor.thrombocytes
     * stemCellFactor;
 
-  bvs.stemCells +=
+    bvs.stemCells +=
     normalFactor(checkRefs.stemCells) * normalizationFactor.stemCells;
+  // bvs.stemCells *=
+  //   1 + normalFactor(checkRefs.stemCells) * normalizationFactor.stemCells;
 }
 
 function handleCriticalCondition(
@@ -111,7 +113,7 @@ function handleCriticalCondition(
   timePassed: number,
   criticalTime: number
 ) {
-  const hasCritical = !Object.values(checkRefs).every((v) => v === "normal");
+  const hasCritical = !Object.values(checkRefs).every((v) => Math.abs(v) <= 1);
 
   if (bvs.criticalTimeStart === null) {
     if (hasCritical) bvs.criticalTimeStart = timePassed;
