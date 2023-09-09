@@ -26,6 +26,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
     return {
       name: drugName,
       wareOffTime: 0,
+      encounterToResistance: 0,
       killFactor: {
         redbloodcells: 0,
         whitebloodcells: 0,
@@ -216,6 +217,22 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
                   ds.map((d) =>
                     d.name === drugName
                       ? { ...d, wareOffTime: +e.target.value }
+                      : d
+                  )
+                )
+              }
+            />
+            <br />
+            <label>Time to encounter before resistance: </label>
+            <input
+              type="number"
+              min="0"
+              value={drugActions.find((i) => i.name === drugName)?.encounterToResistance}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDrugActions((ds) =>
+                  ds.map((d) =>
+                    d.name === drugName
+                      ? { ...d, encounterToResistance: +e.target.value }
                       : d
                   )
                 )

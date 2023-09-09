@@ -38,6 +38,7 @@ const initSimParams: SimulationParameters = {
     {
       name: "Alexan",
       wareOffTime: 1000,
+      encounterToResistance: 8,
       killFactor: {
         redbloodcells: 0.2,
         whitebloodcells: 0.2,
@@ -50,6 +51,7 @@ const initSimParams: SimulationParameters = {
     {
       name: "Oncaspar",
       wareOffTime: 15000,
+      encounterToResistance: 8,
       killFactor: {
         redbloodcells: 0.8,
         whitebloodcells: 0.8,
@@ -62,6 +64,7 @@ const initSimParams: SimulationParameters = {
     {
       name: "Methotrexate",
       wareOffTime: 15000,
+      encounterToResistance: 8,
       killFactor: {
         redbloodcells: 0.8,
         whitebloodcells: 0.8,
@@ -74,6 +77,7 @@ const initSimParams: SimulationParameters = {
     {
       name: "Mercaptopurine",
       wareOffTime: 15000,
+      encounterToResistance: 8,
       killFactor: {
         redbloodcells: 0.8,
         whitebloodcells: 0.8,
@@ -216,6 +220,8 @@ function App() {
 
   const onIntroduceAlexan = () => {
     setBvs((bvs) => {
+      // todo figure out why:
+      // first time this run it causes a hick up in bvs values
       return { ...bvs, drug: { type: "Alexan", introductionTime: timePassed } };
     });
   };

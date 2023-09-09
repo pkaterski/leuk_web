@@ -18,7 +18,7 @@ export type PatientState = {
       drug: Drug,
       resistance: boolean,
       encounters: number,
-      maxEncounters: number;
+      countStarted: boolean,
   }[];
   alive: Boolean;
   criticalTimeStart: number | null;

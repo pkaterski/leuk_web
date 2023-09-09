@@ -46,16 +46,38 @@ export function getDrugWareOffTime(drug: Drug): number {
 function handleDrugAction(
   bvs: PatientState,
   timePassed: number,
-  drugActions: DrugAction[]
+  drugActions: DrugAction[],
 ) {
   if (bvs.drug === null) {
     return;
+  }
+  const drug = bvs.drug;
+  let resistance = bvs.resistance.find(i => i.drug === drug.type);
+  if (resistance === undefined) {
+    resistance = {
+      drug: drug.type,
+      resistance: false,
+      encounters: 1,
+      countStarted: true,
+    };
+    bvs.resistance.push(resistance);
+  } else if (!resistance.countStarted) {
+    resistance.encounters++;
+    resistance.countStarted = true;
   }
 
   // handle drug wareoff
   const drugName = bvs.drug.type;
   const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
   if (drugIndex === -1) throw new Error("Unknown drug used");
+
+  const encounterToResistance = drugActions[drugIndex].encounterToResistance;
+
+  if (resistance !== undefined
+    && !resistance.resistance
+    && encounterToResistance < resistance.encounters) {
+    resistance.resistance = true;
+  }
 
   const wareOffTime = drugActions[drugIndex].wareOffTime; // getDrugWareOffTime(bvs.drug.type);
 
@@ -64,6 +86,7 @@ function handleDrugAction(
   const d = t1 - t0;
 
   if (d >= wareOffTime) {
+    resistance.countStarted = false;
     bvs.drug = null;
   }
 
@@ -72,10 +95,13 @@ function handleDrugAction(
   bvs.whiteBloodCells *= 1 - drugActions[drugIndex].killFactor.whitebloodcells;
   bvs.thrombocytes *= 1 - drugActions[drugIndex].killFactor.thrombocytes;
   bvs.stemCells *= 1 - drugActions[drugIndex].killFactor.stemCells;
-  bvs.aggressiveLeukemiaCells *=
-    1 - drugActions[drugIndex].killFactor.aggressiveleukemiacells;
-  bvs.nonAggressiveLeukemiaCells *=
-    1 - drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells;
+
+  if (!resistance.resistance) {
+    bvs.aggressiveLeukemiaCells *=
+      1 - drugActions[drugIndex].killFactor.aggressiveleukemiacells;
+    bvs.nonAggressiveLeukemiaCells *=
+      1 - drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells;
+  }
 }
 
 function normalizeBloodCells(
@@ -129,6 +155,7 @@ function handleCriticalCondition(
 export type DrugAction = {
   name: Drug;
   wareOffTime: number;
+  encounterToResistance: number;
   killFactor: {
     redbloodcells: number;
     whitebloodcells: number;
