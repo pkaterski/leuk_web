@@ -144,12 +144,7 @@ function App() {
   useEffect(() => {
     areNormalValsRef.current = areNormalVals;
   }, [areNormalVals]);
-  const [drugWareOffTime, setDrugWareOffTime] = useState<number | null>(null);
-  const drugWareOffTimeRef = useRef(drugWareOffTime);
-  useEffect(() => {
-    drugWareOffTimeRef.current = drugWareOffTime;
-  }, [drugWareOffTime]);
-  const [drugTimeRemaining, setDrugTimeRemaining] = useState("0");
+  const [drugTimesRemaining, setDrugTimesRemaining] = useState<string[]>([]);
   const [criticalTime, setCriticalTime] = useState<string | null>(null);
 
   const [simParams, setSimParams] =
@@ -182,19 +177,14 @@ function App() {
 
     setAreNormalVals(checkNormalVals(bvsRef.current));
 
-    if (bvsRef.current.drug !== null) {
-      if (drugWareOffTimeRef.current !== null) {
-        const drugTimePassed =
-          timePassedRef.current - bvsRef.current.drug.introductionTime;
-        const timeRemaining = drugWareOffTimeRef.current - drugTimePassed;
-        // console.log((timeRemaining / 1000).toFixed(1));
-        setDrugTimeRemaining((timeRemaining / 1000).toFixed(1));
-      } else {
-        setDrugWareOffTime(getDrugWareOffTime(bvsRef.current.drug.type));
-      }
-    } else if (drugWareOffTimeRef.current !== null) {
-      setDrugWareOffTime(null);
-    }
+    const drugTimesRemaining = bvsRef.current.drugs.map(drug => {
+      const drugTimePassed =
+        timePassedRef.current - drug.introductionTime;
+      const timeRemaining = getDrugWareOffTime(drug.type) - drugTimePassed;
+      
+      return `${drug.type}: ${(timeRemaining / 1000).toFixed(1)} s`;
+    });
+    setDrugTimesRemaining(drugTimesRemaining);
 
     if (bvsRef.current.criticalTimeStart !== null) {
       setCriticalTime(
@@ -222,7 +212,10 @@ function App() {
     setBvs((bvs) => {
       // todo figure out why:
       // first time this run it causes a hick up in bvs values
-      return { ...bvs, drug: { type: "Alexan", introductionTime: timePassed } };
+      return {
+        ...bvs,
+        drugs: bvs.drugs.concat({ type: "Alexan", introductionTime: timePassed })
+      };
     });
   };
 
@@ -322,11 +315,11 @@ function App() {
             <ul>
               {/* drug in action */}
               <li>
-                drug in action:
+                drugs in action:
                 <span id="drug-in-action">
-                  {bvs.drug === null
+                  {bvs.drugs.length === 0
                     ? "none"
-                    : `${bvs.drug.type} (${drugTimeRemaining} s)`}
+                    : drugTimesRemaining.join(', ')}
                 </span>
               </li>
 

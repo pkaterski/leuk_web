@@ -48,60 +48,60 @@ function handleDrugAction(
   timePassed: number,
   drugActions: DrugAction[],
 ) {
-  if (bvs.drug === null) {
-    return;
+  for (let n = 0; n < bvs.drugs.length; n++) {
+    const drug = bvs.drugs[n];
+    let resistance = bvs.resistance.find(i => i.drug === drug.type);
+    if (resistance === undefined) {
+      resistance = {
+        drug: drug.type,
+        resistance: false,
+        encounters: 1,
+        countStarted: true,
+      };
+      bvs.resistance.push(resistance);
+    } else if (!resistance.countStarted) {
+      resistance.encounters++;
+      resistance.countStarted = true;
+    }
+  
+    // handle drug wareoff
+    const drugName = drug.type;
+    const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
+    if (drugIndex === -1) throw new Error("Unknown drug used");
+  
+    const encounterToResistance = drugActions[drugIndex].encounterToResistance;
+  
+    if (resistance !== undefined
+      && !resistance.resistance
+      && encounterToResistance < resistance.encounters) {
+      resistance.resistance = true;
+    }
+  
+    const wareOffTime = drugActions[drugIndex].wareOffTime; // getDrugWareOffTime(bvs.drug.type);
+  
+    const t0 = drug.introductionTime;
+    const t1 = timePassed;
+    const d = t1 - t0;
+  
+    if (d >= wareOffTime) {
+      resistance.countStarted = false;
+      bvs.drugs.splice(n, 1);
+    }
+  
+    // handle drug action
+    bvs.redBloodCells *= 1 - drugActions[drugIndex].killFactor.redbloodcells;
+    bvs.whiteBloodCells *= 1 - drugActions[drugIndex].killFactor.whitebloodcells;
+    bvs.thrombocytes *= 1 - drugActions[drugIndex].killFactor.thrombocytes;
+    bvs.stemCells *= 1 - drugActions[drugIndex].killFactor.stemCells;
+  
+    if (!resistance.resistance) {
+      bvs.aggressiveLeukemiaCells *=
+        1 - drugActions[drugIndex].killFactor.aggressiveleukemiacells;
+      bvs.nonAggressiveLeukemiaCells *=
+        1 - drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells;
+    }
   }
-  const drug = bvs.drug;
-  let resistance = bvs.resistance.find(i => i.drug === drug.type);
-  if (resistance === undefined) {
-    resistance = {
-      drug: drug.type,
-      resistance: false,
-      encounters: 1,
-      countStarted: true,
-    };
-    bvs.resistance.push(resistance);
-  } else if (!resistance.countStarted) {
-    resistance.encounters++;
-    resistance.countStarted = true;
-  }
 
-  // handle drug wareoff
-  const drugName = bvs.drug.type;
-  const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
-  if (drugIndex === -1) throw new Error("Unknown drug used");
-
-  const encounterToResistance = drugActions[drugIndex].encounterToResistance;
-
-  if (resistance !== undefined
-    && !resistance.resistance
-    && encounterToResistance < resistance.encounters) {
-    resistance.resistance = true;
-  }
-
-  const wareOffTime = drugActions[drugIndex].wareOffTime; // getDrugWareOffTime(bvs.drug.type);
-
-  const t0 = bvs.drug.introductionTime;
-  const t1 = timePassed;
-  const d = t1 - t0;
-
-  if (d >= wareOffTime) {
-    resistance.countStarted = false;
-    bvs.drug = null;
-  }
-
-  // handle drug action
-  bvs.redBloodCells *= 1 - drugActions[drugIndex].killFactor.redbloodcells;
-  bvs.whiteBloodCells *= 1 - drugActions[drugIndex].killFactor.whitebloodcells;
-  bvs.thrombocytes *= 1 - drugActions[drugIndex].killFactor.thrombocytes;
-  bvs.stemCells *= 1 - drugActions[drugIndex].killFactor.stemCells;
-
-  if (!resistance.resistance) {
-    bvs.aggressiveLeukemiaCells *=
-      1 - drugActions[drugIndex].killFactor.aggressiveleukemiacells;
-    bvs.nonAggressiveLeukemiaCells *=
-      1 - drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells;
-  }
 }
 
 function normalizeBloodCells(
@@ -211,7 +211,7 @@ export function handleIter(
   bvs.nonAggressiveLeukemiaCells *= 0.999;
 
   // leukemic growth
-  if (bvs.drug === null) {
+  if (bvs.drugs.length === 0) {
     bvs.nonAggressiveLeukemiaCells *=
       parameters.growthFactors.leukemicNonAggressive;
     bvs.aggressiveLeukemiaCells *= parameters.growthFactors.leukemicAggressive;
@@ -262,13 +262,12 @@ export function handleIter(
   let checkRefs = checkNormalVals(bvs);
 
   // administer drugs
-  const index = treatmentCourse.findIndex((i) => i.atTime === timePassed);
-  if (index !== -1) {
-    // console.log(`drug administered at ${timePassed}`);
-    bvs.drug = {
-      type: treatmentCourse[index].drug,
+  const treatmentsToAdminister = treatmentCourse.filter((i) => i.atTime === timePassed);
+  for (let treatment of treatmentsToAdminister) {
+    bvs.drugs.push({
+      type: treatment.drug,
       introductionTime: timePassed,
-    };
+    });
   }
 
   handleDrugAction(bvs, timePassed, parameters.drugActions);
