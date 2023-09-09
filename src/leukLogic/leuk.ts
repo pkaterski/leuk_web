@@ -48,32 +48,34 @@ function handleDrugAction(
   timePassed: number,
   drugActions: DrugAction[]
 ) {
-  // handle drug wareoff
-  if (bvs.drug !== null) {
-    const drugName = bvs.drug.type;
-    const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
-    if (drugIndex === -1) throw new Error("Unknown drug used");
-
-    const wareOffTime = drugActions[drugIndex].wareOffTime; // getDrugWareOffTime(bvs.drug.type);
-
-    const t0 = bvs.drug.introductionTime;
-    const t1 = timePassed;
-    const d = t1 - t0;
-
-    if (d >= wareOffTime) {
-      bvs.drug = null;
-    }
-
-    // handle drug action
-    bvs.redBloodCells *= 1 - drugActions[drugIndex].killFactor.redbloodcells;
-    bvs.whiteBloodCells *= 1 - drugActions[drugIndex].killFactor.whitebloodcells;
-    bvs.thrombocytes *= 1 - drugActions[drugIndex].killFactor.thrombocytes;
-    bvs.stemCells *= 1 - drugActions[drugIndex].killFactor.stemCells;
-    bvs.aggressiveLeukemiaCells *=
-      1 - drugActions[drugIndex].killFactor.aggressiveleukemiacells;
-    bvs.nonAggressiveLeukemiaCells *=
-      1 - drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells;
+  if (bvs.drug === null) {
+    return;
   }
+
+  // handle drug wareoff
+  const drugName = bvs.drug.type;
+  const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
+  if (drugIndex === -1) throw new Error("Unknown drug used");
+
+  const wareOffTime = drugActions[drugIndex].wareOffTime; // getDrugWareOffTime(bvs.drug.type);
+
+  const t0 = bvs.drug.introductionTime;
+  const t1 = timePassed;
+  const d = t1 - t0;
+
+  if (d >= wareOffTime) {
+    bvs.drug = null;
+  }
+
+  // handle drug action
+  bvs.redBloodCells *= 1 - drugActions[drugIndex].killFactor.redbloodcells;
+  bvs.whiteBloodCells *= 1 - drugActions[drugIndex].killFactor.whitebloodcells;
+  bvs.thrombocytes *= 1 - drugActions[drugIndex].killFactor.thrombocytes;
+  bvs.stemCells *= 1 - drugActions[drugIndex].killFactor.stemCells;
+  bvs.aggressiveLeukemiaCells *=
+    1 - drugActions[drugIndex].killFactor.aggressiveleukemiacells;
+  bvs.nonAggressiveLeukemiaCells *=
+    1 - drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells;
 }
 
 function normalizeBloodCells(
