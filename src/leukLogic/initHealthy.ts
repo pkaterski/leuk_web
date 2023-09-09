@@ -14,6 +14,12 @@ export type PatientState = {
   nonAggressiveLeukemiaCells: number;
   stemCells: number;
   drug: { type: Drug; introductionTime: number } | null;
+  resistance: {
+      drug: Drug,
+      resistance: boolean,
+      encounters: number,
+      maxEncounters: number;
+  }[];
   alive: Boolean;
   criticalTimeStart: number | null;
 };
@@ -26,6 +32,7 @@ const bloodValuesZero: PatientState = {
   aggressiveLeukemiaCells: 0,
   nonAggressiveLeukemiaCells: 0,
   drug: null,
+  resistance: [],
   alive: true,
   criticalTimeStart: null,
 };
