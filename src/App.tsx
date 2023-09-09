@@ -380,6 +380,8 @@ function App() {
               modal
               closeOnDocumentClick={false}
             >
+              {/*
+              // @ts-ignore */}
               {(close: any) => (
                 <TreatmentCoursesMenu
                   closeFn={close}
@@ -393,6 +395,8 @@ function App() {
               modal
               closeOnDocumentClick={false}
             >
+              {/*
+              // @ts-ignore */}
               {(close: any) => (
                 <Parameters
                   closeFn={close}
@@ -408,6 +412,8 @@ function App() {
               modal
               closeOnDocumentClick={false}
             >
+              {/*
+              // @ts-ignore */}
               {(close: any) => <HelpInformation closeFn={close} />}
             </Popup>
           </div>
