@@ -20,6 +20,9 @@ export type PatientState = {
       encounters: number,
       countStarted: boolean,
   }[];
+  heartHealth: number; // number between 0 - 100
+  liverHealth: number;
+  kidneyHealth: number;
   alive: Boolean;
   criticalTimeStart: number | null;
 };
@@ -33,6 +36,9 @@ const bloodValuesZero: PatientState = {
   nonAggressiveLeukemiaCells: 0,
   drugs: [],
   resistance: [],
+  heartHealth: 100,
+  liverHealth: 100,
+  kidneyHealth: 100,
   alive: true,
   criticalTimeStart: null,
 };

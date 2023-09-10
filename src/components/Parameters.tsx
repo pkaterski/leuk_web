@@ -22,7 +22,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
   const [killT, setKillT] = useState(0);
   const [killStem, setKillSteam] = useState(0);
 
-  const initDrugActions = DRUGS.map((drugName) => {
+  const initDrugActions: DrugAction[] = DRUGS.map((drugName) => {
     return {
       name: drugName,
       wareOffTime: 0,
@@ -35,6 +35,9 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
         aggressiveleukemiacells: 0,
         nonAggressiveLeukemiaCells: 0,
       },
+      heartDamage: 0,
+      liverDamage: 0,
+      kidneyDamage: 0,
     };
   });
 
@@ -233,6 +236,54 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
                   ds.map((d) =>
                     d.name === drugName
                       ? { ...d, encounterToResistance: +e.target.value }
+                      : d
+                  )
+                )
+              }
+            />
+            <br />
+            <label>Heart Damage: </label>
+            <input
+              type="number"
+              min="0"
+              value={drugActions.find((i) => i.name === drugName)?.heartDamage}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDrugActions((ds) =>
+                  ds.map((d) =>
+                    d.name === drugName
+                      ? { ...d, heartDamage: +e.target.value }
+                      : d
+                  )
+                )
+              }
+            />
+            <br />
+            <label>Liver Damage: </label>
+            <input
+              type="number"
+              min="0"
+              value={drugActions.find((i) => i.name === drugName)?.liverDamage}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDrugActions((ds) =>
+                  ds.map((d) =>
+                    d.name === drugName
+                      ? { ...d, liverDamage: +e.target.value }
+                      : d
+                  )
+                )
+              }
+            />
+            <br />
+            <label>Kidney Damage: </label>
+            <input
+              type="number"
+              min="0"
+              value={drugActions.find((i) => i.name === drugName)?.kidneyDamage}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDrugActions((ds) =>
+                  ds.map((d) =>
+                    d.name === drugName
+                      ? { ...d, kidneyDamage: +e.target.value }
                       : d
                   )
                 )

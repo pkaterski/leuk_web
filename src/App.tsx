@@ -47,6 +47,9 @@ const initSimParams: SimulationParameters = {
         aggressiveleukemiacells: 0.4,
         nonAggressiveLeukemiaCells: 0.2,
       },
+      liverDamage: 10,
+      heartDamage: 0,
+      kidneyDamage: 0,
     },
     {
       name: "Oncaspar",
@@ -60,6 +63,9 @@ const initSimParams: SimulationParameters = {
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
       },
+      liverDamage: 0,
+      heartDamage: 0,
+      kidneyDamage: 0,
     },
     {
       name: "Methotrexate",
@@ -73,6 +79,9 @@ const initSimParams: SimulationParameters = {
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
       },
+      liverDamage: 0,
+      heartDamage: 0,
+      kidneyDamage: 0,
     },
     {
       name: "Mercaptopurine",
@@ -86,6 +95,9 @@ const initSimParams: SimulationParameters = {
         aggressiveleukemiacells: 0.6,
         nonAggressiveLeukemiaCells: 0.8,
       },
+      liverDamage: 0,
+      heartDamage: 0,
+      kidneyDamage: 0,
     },
   ],
   normalizationFactor: {
@@ -308,6 +320,33 @@ function App() {
                 non-aggressive leukemia cells:
                 <span id="non-aggressive-leukemia-cell-count">
                   {bvs.nonAggressiveLeukemiaCells.toFixed()}
+                </span>
+              </li>
+            </ul>
+
+            <ul>
+              <li>
+                Heart Health:
+                <span
+                  id="heart-health"
+                >
+                  {bvs.heartHealth.toFixed()}
+                </span>
+              </li>
+              <li>
+                Liver Health:
+                <span
+                  id="liver-health"
+                >
+                  {bvs.liverHealth.toFixed()}
+                </span>
+              </li>
+              <li>
+                kidney Health:
+                <span
+                  id="kidney-health"
+                >
+                  {bvs.kidneyHealth.toFixed()}
                 </span>
               </li>
             </ul>

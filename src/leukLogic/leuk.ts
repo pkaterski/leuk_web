@@ -42,6 +42,15 @@ export function getDrugWareOffTime(drug: Drug): number {
   }
 }
 
+function handleOrganDamage(bvs: PatientState, drugAction: DrugAction) {
+  bvs.heartHealth -= drugAction.heartDamage;
+  bvs.liverHealth -= drugAction.liverDamage;
+  bvs.kidneyHealth -= drugAction.kidneyDamage;
+  if (bvs.heartHealth <= 0 || bvs.liverHealth <= 0 || bvs.kidneyHealth <= 0) {
+    bvs.alive = false;
+  }
+}
+
 // modifies bvs
 function handleDrugAction(
   bvs: PatientState,
@@ -51,6 +60,8 @@ function handleDrugAction(
   for (let n = 0; n < bvs.drugs.length; n++) {
     const drug = bvs.drugs[n];
     let resistance = bvs.resistance.find(i => i.drug === drug.type);
+    // first time drug is detected befere we consire it's ware-off period
+    let firstItter = false;
     if (resistance === undefined) {
       resistance = {
         drug: drug.type,
@@ -59,9 +70,11 @@ function handleDrugAction(
         countStarted: true,
       };
       bvs.resistance.push(resistance);
+      firstItter = true;
     } else if (!resistance.countStarted) {
       resistance.encounters++;
       resistance.countStarted = true;
+      firstItter = true;
     }
   
     // handle drug wareoff
@@ -70,6 +83,10 @@ function handleDrugAction(
     if (drugIndex === -1) throw new Error("Unknown drug used");
   
     const encounterToResistance = drugActions[drugIndex].encounterToResistance;
+
+    if (firstItter) {
+      handleOrganDamage(bvs, drugActions[drugIndex]);
+    }
   
     if (resistance !== undefined
       && !resistance.resistance
@@ -164,6 +181,9 @@ export type DrugAction = {
     aggressiveleukemiacells: number;
     nonAggressiveLeukemiaCells: number;
   };
+  heartDamage: number;
+  liverDamage: number;
+  kidneyDamage: number;
 };
 
 export type NormalizationFactor = {
