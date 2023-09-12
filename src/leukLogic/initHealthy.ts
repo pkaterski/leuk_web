@@ -47,11 +47,11 @@ const initNormalBloodVals = (bvsIn: PatientState) => {
   const bvs = { ...bvsIn };
   const r = Math.random;
 
-  const wbc = (r() * (11 - 4.5) + 4.5) * 10 ** 3;
-  const rbc = (r() * (6.1 - 4.7) + 4.7) * 10 ** 6;
-  const t = (r() * (4.5 - 1.5) + 1.5) * 10 ** 5;
+  const wbc = Math.floor((r() * (11 - 4.5) + 4.5) * 10 ** 3);
+  const rbc = Math.floor((r() * (6.1 - 4.7) + 4.7) * 10 ** 6);
+  const t = Math.floor((r() * (4.5 - 1.5) + 1.5) * 10 ** 5);
 
-  const stemCells = (r() * (20 - 5) + 5) * 10 ** 4;
+  const stemCells = Math.floor((r() * (20 - 5) + 5) * 10 ** 4);
 
   bvs.whiteBloodCells = wbc;
   bvs.redBloodCells = rbc;

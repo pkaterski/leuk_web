@@ -199,6 +199,14 @@ export type NormalizationFactor = {
 };
 
 export type SimulationParameters = {
+  initialConditions: {
+    redBloodCells: number;
+    whiteBloodCells: number;
+    thrombocytes: number;
+    stemCells: number;
+    leukemicAggressive: number;
+    leukemicNonAggressive: number;
+  };
   growthFactors: {
     leukemicAggressive: number;
     leukemicNonAggressive: number;

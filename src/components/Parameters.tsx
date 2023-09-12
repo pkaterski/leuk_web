@@ -10,6 +10,13 @@ type ParametersProps = {
 };
 
 const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
+  const [initRedBloodCells, setInitRedBloodCells] = useState(0);
+  const [initWhiteBloodCells, setInitWhiteBloodCells] = useState(0);
+  const [initThrombocytes, setInitThrombocytes] = useState(0);
+  const [initStemCells, setInitStemCells] = useState(0);
+  const [initLeukemicAggressive, setInitLeukemicAggressive] = useState(0);
+  const [initLeukemicNonAggressive, setInitLeukemicNonAggressive] = useState(0);
+
   const [leukemicAggressiveGrowth, setLeukemicAggressiveGrowth] = useState(0);
   const [leukemicNonAggressiveGrowth, setLeukemicNonAggressiveGrowth] =
     useState(0);
@@ -51,6 +58,13 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
   const [criticalTime, setCriticalTime] = useState(0);
 
   const setToInitialParams = () => {
+    setInitRedBloodCells(props.initParams.initialConditions.redBloodCells);
+    setInitWhiteBloodCells(props.initParams.initialConditions.whiteBloodCells);
+    setInitThrombocytes(props.initParams.initialConditions.thrombocytes);
+    setInitStemCells(props.initParams.initialConditions.stemCells);
+    setInitLeukemicAggressive(props.initParams.initialConditions.leukemicAggressive);
+    setInitLeukemicNonAggressive(props.initParams.initialConditions.leukemicNonAggressive);
+
     setLeukemicAggressiveGrowth(
       props.initParams.growthFactors.leukemicAggressive
     );
@@ -81,6 +95,14 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
 
   const handleSave = () => {
     const newParams: SimulationParameters = {
+      initialConditions: {
+        redBloodCells: initRedBloodCells,
+        whiteBloodCells: initWhiteBloodCells,
+        thrombocytes: initThrombocytes,
+        stemCells: initStemCells,
+        leukemicAggressive: initLeukemicAggressive,
+        leukemicNonAggressive: initLeukemicNonAggressive,
+      },
       growthFactors: {
         leukemicAggressive: leukemicAggressiveGrowth,
         leukemicNonAggressive: leukemicNonAggressiveGrowth,
@@ -114,6 +136,69 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
       <h2>Simulation Parameters</h2>
       <hr />
 
+      <h4>Initial Counts:</h4>
+      <label>Red Blood Cells:</label>
+      <input
+        type="number"
+        min="0"
+        value={initRedBloodCells}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setInitRedBloodCells(+e.target.value)
+        }
+      />
+      <br />
+      <label>White Blood Cells:</label>
+      <input
+        type="number"
+        min="0"
+        value={initWhiteBloodCells}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setInitWhiteBloodCells(+e.target.value)
+        }
+      />
+      <br />
+      <label>Thrombocytes:</label>
+      <input
+        type="number"
+        min="0"
+        value={initThrombocytes}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setInitThrombocytes(+e.target.value)
+        }
+      />
+      <br />
+      <label>Stem Cells:</label>
+      <input
+        type="number"
+        min="0"
+        value={initStemCells}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setInitStemCells(+e.target.value)
+        }
+      />
+      <br />
+      <label>Aggressive Leukemia Cells:</label>
+      <input
+        type="number"
+        min="0"
+        value={initLeukemicAggressive}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setInitLeukemicAggressive(+e.target.value)
+        }
+      />
+      <br />
+      <label>Non-Aggressive Leukemia Cells:</label>
+      <input
+        type="number"
+        min="0"
+        value={initLeukemicNonAggressive}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setInitLeukemicNonAggressive(+e.target.value)
+        }
+      />
+      <hr />
+
+      <h4>Growth factors</h4>
       <label>Leukemic Aggressive Cells Growth Factor:</label>
       <input
         type="number"

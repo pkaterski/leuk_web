@@ -20,6 +20,14 @@ import PlotComponent from "./components/PlotComponent";
 import HelpInformation from "./components/HelpInformation";
 
 const initSimParams: SimulationParameters = {
+  initialConditions: {
+    redBloodCells: beginBVs.redBloodCells,
+    whiteBloodCells: beginBVs.whiteBloodCells,
+    thrombocytes: beginBVs.thrombocytes,
+    stemCells: beginBVs.stemCells,
+    leukemicAggressive: beginBVs.aggressiveLeukemiaCells,
+    leukemicNonAggressive: beginBVs.nonAggressiveLeukemiaCells,
+  },
   growthFactors: {
     leukemicAggressive: 1.01,
     leukemicNonAggressive: 1.005,
@@ -131,6 +139,10 @@ function App() {
   }, [therapyCourses]);
 
   const [started, setStarted] = useState(false);
+  const startedRef = useRef(started);
+  useEffect(() => {
+    startedRef.current = started;
+  }, [started]);
   const [pauseState, setPauseState] = useState(true);
   const pauseStateRef = useRef(pauseState);
   useEffect(() => {
@@ -141,6 +153,11 @@ function App() {
   useEffect(() => {
     timePassedRef.current = timePassed;
   }, [timePassed]);
+  const [initBvs, setInitBvs] = useState<PatientState>({ ...beginBVs });
+  const initBvsRef = useRef(initBvs);
+  useEffect(() => {
+    initBvsRef.current = initBvs;
+  }, [initBvs]);
   const [bvs, setBvs] = useState<PatientState>({ ...beginBVs });
   const bvsRef = useRef(bvs);
   useEffect(() => {
@@ -164,6 +181,21 @@ function App() {
   const simParamsRef = useRef(simParams);
   useEffect(() => {
     simParamsRef.current = simParams;
+    if (!startedRef.current) {
+      const oldInitBvs = initBvsRef.current;
+      const initParams = simParamsRef.current.initialConditions;
+      const newInitBvs = {
+        ...oldInitBvs,
+        whiteBloodCells: initParams.whiteBloodCells,
+        redBloodCells: initParams.redBloodCells,
+        thrombocytes: initParams.thrombocytes,
+        stemCells: initParams.stemCells,
+        aggressiveLeukemiaCells: initParams.leukemicAggressive,
+        nonAggressiveLeukemiaCells: initParams.leukemicNonAggressive,
+      };
+      setInitBvs(newInitBvs);
+      setBvs(newInitBvs);
+    }
   }, [simParams]);
 
   const [bvsAcc, setBvsAcc] = useState<PatientState[]>([]);
@@ -235,7 +267,7 @@ function App() {
     setPauseState(true);
     setStarted(false);
 
-    setBvs(beginBVs);
+    setBvs(initBvsRef.current);
     setBvsAcc([]);
 
     setAreNormalVals({
