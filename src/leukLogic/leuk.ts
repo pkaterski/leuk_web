@@ -46,6 +46,11 @@ function handleOrganDamage(bvs: PatientState, drugAction: DrugAction) {
   bvs.heartHealth -= drugAction.heartDamage;
   bvs.liverHealth -= drugAction.liverDamage;
   bvs.kidneyHealth -= drugAction.kidneyDamage;
+
+  // cap negative values at 0
+  bvs.heartHealth *= bvs.heartHealth < 0 ? 0 : 1;
+  bvs.liverHealth *= bvs.liverHealth < 0 ? 0 : 1;
+  bvs.kidneyHealth *= bvs.kidneyHealth < 0 ? 0 : 1;
   if (bvs.heartHealth <= 0 || bvs.liverHealth <= 0 || bvs.kidneyHealth <= 0) {
     bvs.alive = false;
   }
