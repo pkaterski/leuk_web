@@ -4,6 +4,8 @@ import {
   BloodValueRefs,
   PatientState,
   checkNormalVals,
+  DRUGS,
+  Drug,
 } from "./leukLogic/initHealthy";
 import {
   beginBVs,
@@ -254,13 +256,13 @@ function App() {
     return () => clearInterval(intervalId);
   }, [simulationSpeed]);
 
-  const onIntroduceAlexan = () => {
+  const onIntroduceDrug = (drug: Drug) => {
     setBvs((bvs) => {
       // todo figure out why:
       // first time this run it causes a hick up in bvs values
       return {
         ...bvs,
-        drugs: bvs.drugs.concat({ type: "Alexan", introductionTime: timePassed })
+        drugs: bvs.drugs.concat({ type: drug, introductionTime: timePassed })
       };
     });
   };
@@ -432,13 +434,9 @@ function App() {
             >
               {!started ? "start" : pauseState ? "resume" : "pause"}
             </button>
-            <button type="button" id="alexan-btn" onClick={onIntroduceAlexan}>
-              Introduce Alexan
-            </button>
-            <button type="button" id="reset-btn" onClick={onReset}>
-              Reset
-            </button>
-            <br />
+
+            {/* empty spaces */}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
             <label>Simulation Speed:</label>
             <input
@@ -449,9 +447,15 @@ function App() {
                 setSimulationSpeed(+e.target.value)
               }
             />
-            <br />
 
-            <br />
+            {/* empty spaces */}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            <button type="button" id="reset-btn" onClick={onReset}>
+              Reset
+            </button>
+
+            <hr />
             <Popup
               trigger={<button>Therapy course</button>}
               modal
@@ -493,6 +497,21 @@ function App() {
               // @ts-ignore */}
               {(close: any) => <HelpInformation closeFn={close} />}
             </Popup>
+            <hr />
+
+            {DRUGS.map((drugName) => {
+              return (<>
+                <button
+                  type="button"
+                  id="alexan-btn"
+                  onClick={() => onIntroduceDrug(drugName)}>
+
+                  {drugName}
+
+                </button>
+              </>)
+            })}
+            
           </div>
           {/* <PlotComponent
             xs={timePassedAcc}

@@ -16,6 +16,10 @@ button {
     flex-wrap: wrap;
 }
 
+.main-part {
+    max-width: 50%;
+}
+
 .footer {
     position: fixed;
     left: 0;
