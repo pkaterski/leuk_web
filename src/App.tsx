@@ -224,7 +224,9 @@ function App() {
     const drugTimesRemaining = bvsRef.current.drugs.map(drug => {
       const drugTimePassed =
         timePassedRef.current - drug.introductionTime;
-      const timeRemaining = getDrugWareOffTime(drug.type) - drugTimePassed;
+      const timeRemaining = getDrugWareOffTime(
+        drug.type,
+        simParamsRef.current.drugActions) - drugTimePassed;
       
       return `${drug.type}: ${(timeRemaining / 1000).toFixed(1)} s`;
     });

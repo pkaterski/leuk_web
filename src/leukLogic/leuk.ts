@@ -27,18 +27,18 @@ export const beginBVs = introduceLeukemia(initBVs);
 
 // export const CRITICAL_TIME = 30000;
 
-export function getDrugWareOffTime(drug: Drug): number {
+export function getDrugWareOffTime(drug: Drug, drugActions: DrugAction[]): number {
   switch (drug) {
     case "Alexan":
-      return 1000;
+      return drugActions[0].wareOffTime;
     case "Oncaspar":
-      return 15000;
+      return drugActions[1].wareOffTime;
     case "Methotrexate":
-      return 15000;
+      return drugActions[2].wareOffTime;
     case "Mercaptopurine":
-      return 15000;
+      return drugActions[3].wareOffTime;
     default:
-      return 0;
+      throw new Error("Unknown drug");
   }
 }
 
