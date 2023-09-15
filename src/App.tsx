@@ -267,7 +267,10 @@ function App() {
     setPauseState(true);
     setStarted(false);
 
-    setBvs(initBvsRef.current);
+    setBvs({
+      ...initBvsRef.current,
+      drugs: [], // active drugs reset
+    });
     setBvsAcc([]);
 
     setAreNormalVals({
@@ -279,6 +282,8 @@ function App() {
 
     setTimePassed(0);
     setTimePassedAcc([]);
+
+    setDrugTimesRemaining([]);
 
     setCriticalTime(null);
   };
