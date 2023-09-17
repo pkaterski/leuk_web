@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/plotly.js-basic-dist': ^1.54.1
   '@types/react': ^18.0.27
   '@types/react-dom': ^18.0.10
   '@types/react-plotly.js': ^2.6.0
@@ -14,6 +15,7 @@ specifiers:
   vite: ^4.1.0
 
 dependencies:
+  '@types/plotly.js-basic-dist': 1.54.1
   plotly.js: 2.18.2
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -619,9 +621,14 @@ packages:
       '@turf/helpers': 6.5.0
     dev: false
 
+  /@types/plotly.js-basic-dist/1.54.1:
+    resolution: {integrity: sha512-PAowclM1Z9nfTGqLn2KrN3dDXF2M9TalggShN/k/6jyUZTkxfgSoJ3HGReyUqjxsRBgUZnWRIPmLOA+sDsGWFA==}
+    dependencies:
+      '@types/plotly.js': 2.12.18
+    dev: false
+
   /@types/plotly.js/2.12.18:
     resolution: {integrity: sha512-ff+CIEWnqZNjZqHtQZvkEAVuLs9fkm1f54QnPVmgoET7wMHdSqUka2hasVN4e5yfHD05YwGjsAtCseewJh/BMw==}
-    dev: true
 
   /@types/prop-types/15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}

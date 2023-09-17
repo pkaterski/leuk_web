@@ -6,6 +6,7 @@ import {
   checkNormalVals,
   DRUGS,
   Drug,
+  NORMAL_REFERENCES,
 } from "./leukLogic/initHealthy";
 import {
   beginBVs,
@@ -553,16 +554,19 @@ function App() {
             title="Total WBC Count"
             widthFactor={2}
             heightFactor={2}
+            highLowRefs={{ high: NORMAL_REFERENCES.whiteBloodCells.high, low: NORMAL_REFERENCES.whiteBloodCells.low }}
           ></PlotComponent>
           <PlotComponent
             xs={timePassedAcc}
             ys={bvsAcc.map((bvs) => bvs.whiteBloodCells)}
             title="Healthy White Blood Cells"
+            highLowRefs={{ high: NORMAL_REFERENCES.whiteBloodCells.high, low: NORMAL_REFERENCES.whiteBloodCells.low }}
           ></PlotComponent>
           <PlotComponent
             xs={timePassedAcc}
             ys={bvsAcc.map((bvs) => bvs.stemCells)}
             title="Stem Cells"
+            highLowRefs={{ high: NORMAL_REFERENCES.stemCells.high, low: NORMAL_REFERENCES.stemCells.low }}
           ></PlotComponent>
           {/* <PlotComponent
             xs={timePassedAcc}
