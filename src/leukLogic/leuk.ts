@@ -80,15 +80,15 @@ function handleDrugAction(
         drug: drug.type,
         resistance: false,
         encounters: drug.doseMg / avgDose,
-        countStarted: true,
       };
       bvs.resistance.push(resistance);
+      drug.countStarted = true;
       firstItter = true;
-    } else if (!resistance.countStarted) {
+    } else if (!drug.countStarted) {
       const avgDose = AVG_DOSE.get(drug.type);
       if (avgDose === undefined) throw new Error("ITTER: DRUG encounters: drug not listed");
       resistance.encounters += drug.doseMg / avgDose;
-      resistance.countStarted = true;
+      drug.countStarted = true;
       firstItter = true;
     }
   
@@ -120,7 +120,7 @@ function handleDrugAction(
     const d = t1 - t0;
   
     if (d >= wareOffTime) {
-      resistance.countStarted = false;
+      drug.countStarted = false; // line can be removed
       bvs.drugs.splice(n, 1);
     }
   
@@ -315,6 +315,7 @@ export function handleIter(
       type: treatment.drug,
       introductionTime: timePassed,
       doseMg: treatment.doseMg,
+      countStarted: false,
     });
   }
 

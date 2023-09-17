@@ -277,7 +277,13 @@ function App() {
       if (dose === undefined) throw new Error(`INTRO DRUG: AVG DOSE not listed for ${drug}`);
       return {
         ...bvs,
-        drugs: bvs.drugs.concat({ type: drug, introductionTime: timePassed, doseMg: dose })
+        drugs: bvs.drugs.concat({
+          type: drug,
+          introductionTime:
+          timePassed,
+          doseMg: dose,
+          countStarted: false
+        }),
       };
     });
   };

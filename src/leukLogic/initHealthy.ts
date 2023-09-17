@@ -25,12 +25,11 @@ export type PatientState = {
   aggressiveLeukemiaCells: number;
   nonAggressiveLeukemiaCells: number;
   stemCells: number;
-  drugs: { type: Drug; introductionTime: number, doseMg: number; }[]; // todo BUG HERE move countStarted to drugs
+  drugs: { type: Drug; introductionTime: number, doseMg: number; countStarted: boolean; }[];
   resistance: {
-      drug: Drug,
-      resistance: boolean,
-      encounters: number,
-      countStarted: boolean,
+      drug: Drug;
+      resistance: boolean;
+      encounters: number;
   }[];
   heartHealth: number; // number between 0 - 100
   liverHealth: number;
