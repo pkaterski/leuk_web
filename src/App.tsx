@@ -133,6 +133,9 @@ const initSimParams: SimulationParameters = {
 
 function App() {
   const TIME_INTERVAL_MS = 100;
+  // make sure that this const is a multiple of TIME_INTERVAL_MS,
+  // otherwise dosing at specific times will not work
+  const MS_TO_DAYS = 1000;
   const [simulationSpeed, setSimulationSpeed] = useState<number>(100);
   const simulationSpeedRef = useRef(simulationSpeed);
   useEffect(() => {
@@ -231,7 +234,7 @@ function App() {
     setBvs(newBvs);
 
     setBvsAcc((bvss) => [...bvss, newBvs].slice(-600));
-    setTimePassedAcc((ts) => [...ts, newTimePassed].slice(-600));
+    setTimePassedAcc((ts) => [...ts, newTimePassed / MS_TO_DAYS].slice(-600));
 
     setAreNormalVals(checkNormalVals(bvsRef.current));
 
@@ -241,8 +244,8 @@ function App() {
       const timeRemaining = getDrugWareOffTime(
         drug.type,
         simParamsRef.current.drugActions) - drugTimePassed;
-      
-      return `${drug.type}: ${(timeRemaining / 1000).toFixed(1)} s`;
+
+      return `${drug.type}: ${(timeRemaining / MS_TO_DAYS).toFixed(1)} days`;
     });
     setDrugTimesRemaining(drugTimesRemaining);
 
@@ -250,8 +253,8 @@ function App() {
       setCriticalTime(
         (
           (timePassedRef.current - bvsRef.current.criticalTimeStart) /
-          1000
-        ).toFixed(1) + " units"
+          MS_TO_DAYS
+        ).toFixed(1) + " days"
       );
     } else {
       setCriticalTime(null);
@@ -320,7 +323,7 @@ function App() {
           <div className="main-part">
             <h1>Computer Simulation for Leukemia Treatment</h1>
 
-            <h4>Blood values:</h4>
+            <h4>Blood values at day {(timePassed / MS_TO_DAYS).toFixed(1)}:</h4>
 
             {/* normal blood cells */}
             <ul>
@@ -490,6 +493,7 @@ function App() {
                   initialTreatmentCourses={therapyCourses}
                   onTreatmentCoursesChange={(tcs) => setTerapyCourses(tcs)}
                   simulationParameters={simParams}
+                  msToDays={MS_TO_DAYS}
                 />
               )}
             </Popup>
@@ -507,6 +511,7 @@ function App() {
                   onParamChange={(newParams: SimulationParameters) =>
                     setSimParams(newParams)
                   }
+                  msToDays={MS_TO_DAYS}
                 />
               )}
             </Popup>

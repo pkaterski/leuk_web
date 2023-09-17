@@ -7,6 +7,7 @@ type TreatmentCoursesPopupProps = {
   initialTreatmentCourses: TreatmentCourse[];
   onTreatmentCoursesChange: (newTcs: TreatmentCourse[]) => void;
   simulationParameters: SimulationParameters;
+  msToDays: number;
 };
 
 const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
@@ -16,8 +17,8 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
     []
   );
   const [selectedDrug, setSelectedDrug] = useState<Drug>("Alexan");
-  const [selectedTime, setSelectedTime] = useState(100);
-  const [lastedTime, setLatestTime] = useState(100);
+  const [selectedTime, setSelectedTime] = useState(1);
+  const [lastedTime, setLatestTime] = useState(1);
   const [selectedDose, setSelectedDose] = useState(100);
 
   useEffect(() => {
@@ -26,8 +27,8 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
     setTreatmentCourses(initTcs);
     const lastTcs = initTcs.slice(-1)[0];
     if (lastTcs !== undefined) {
-      setLatestTime(lastTcs.atTime);
-      setSelectedTime(lastTcs.atTime + 100);
+      setLatestTime(lastTcs.atTime / props.msToDays);
+      setSelectedTime(lastTcs.atTime / props.msToDays);
     }
     setAvgDoseOnSelectedDrug(selectedDrug);
   }, []);
@@ -35,11 +36,11 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
   const handleAddCourse = () => {
     const newTcs = [
       ...treatmentCourses,
-      { drug: selectedDrug, atTime: selectedTime, doseMg: selectedDose },
+      { drug: selectedDrug, atTime: selectedTime * props.msToDays, doseMg: selectedDose },
     ];
     setTreatmentCourses(newTcs);
     setLatestTime(selectedTime);
-    setSelectedTime((i) => i + 100);
+    setSelectedTime((i) => i + 1);
     props.onTreatmentCoursesChange(newTcs);
   };
 
@@ -68,12 +69,12 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
     // handle llatest time
     if (index === tcLen - 1) {
       if (tcLen === 1) {
-        setLatestTime(100);
-        setSelectedTime(100);
+        setLatestTime(1);
+        setSelectedTime(1);
       } else {
         const prevTime = treatmentCourses[tcLen - 2].atTime;
         setLatestTime(prevTime);
-        setSelectedTime(prevTime + 100);
+        setSelectedTime(prevTime);
       }
     }
 
@@ -99,12 +100,12 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
           </option>
         ))}
       </select>
-      <label htmlFor="drugAtTimeInput">&nbsp;&nbsp;at time: </label>
+      <label htmlFor="drugAtTimeInput">&nbsp;&nbsp;at day: </label>
       <input
         type="number"
         id="drugAtTimeInput"
-        min={lastedTime + 100}
-        step={100}
+        min={lastedTime}
+        step={1}
         value={selectedTime}
         onChange={handleTimeChange}
       />
@@ -123,7 +124,7 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
         {treatmentCourses.map((tc, index) => {
           return (
             <p style={{ textAlign: "right" }} key={index}>
-              {tc.drug} at time: {tc.atTime} ms ({tc.doseMg}  mg)
+              {tc.drug} at day: {(tc.atTime / props.msToDays).toFixed()} day ({tc.doseMg}  mg)
               <button
                 style={{ marginLeft: "20px" }}
                 onClick={() => handleRemove(index)}

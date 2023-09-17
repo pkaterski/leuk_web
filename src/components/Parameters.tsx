@@ -7,6 +7,7 @@ type ParametersProps = {
   closeFn: () => void;
   initParams: SimulationParameters;
   onParamChange: (newParams: SimulationParameters) => void;
+  msToDays: number;
 };
 
 const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
@@ -299,7 +300,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             <h4>{drugName} parameters:</h4>
             <br />
 
-            <label>Ware-Off Time: </label>
+            <label>Ware-Off Time: (in days x{props.msToDays}) </label>
             <input
               type="number"
               min="0"
@@ -316,6 +317,11 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
                 })
               }
             />
+            <p style={{display: "inline-block"}}>
+              {/*
+              // @ts-ignore */}
+              &nbsp;&nbsp;value in days: {(drugActions.get(drugName)?.wareOffTime / props.msToDays).toFixed(1)}
+            </p>
             <br />
             <label>Avarage Dose: </label>
             <input
@@ -608,7 +614,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
       />
       <hr />
 
-      <label>Critical Time Until Death: </label>
+      <label>Critical Time Until Death: (in days x{props.msToDays}) </label>
       <input
         type="number"
         min="0"
@@ -617,6 +623,9 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
           setCriticalTime(+e.target.value)
         }
       />
+      <p style={{display: "inline-block"}}>
+        &nbsp;&nbsp;value in days: {(criticalTime / props.msToDays).toFixed(1)}
+      </p>
       <hr />
 
       <button onClick={handleSave}>save</button>
