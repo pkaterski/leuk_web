@@ -10,6 +10,34 @@ export const DRUGS = [
 ] as const;
 export type Drug = typeof DRUGS[number];
 
+export const NORMAL_REFERENCES = {
+  whiteBloodCells: {
+    high: 11000,
+    low: 4500,
+  },
+  redBloodCells: {
+    high: 6100000,
+    low: 4700000,
+  },
+  thrombocytes: {
+    high: 450000,
+    low: 150000,
+  },
+  stemCells: {
+    high: 200000,
+    low: 50000,
+  },
+};
+
+type privateRefCellType = "whiteBloodCells"
+  | "redBloodCells"
+  | "thrombocytes"
+  | "stemCells";
+
+const getRef = (refType: privateRefCellType) => {
+  return NORMAL_REFERENCES[refType];
+};
+
 export type PatientState = {
   whiteBloodCells: number;
   redBloodCells: number;
@@ -50,11 +78,16 @@ const initNormalBloodVals = (bvsIn: PatientState) => {
   const bvs = { ...bvsIn };
   const r = Math.random;
 
-  const wbc = Math.floor((r() * (11 - 4.5) + 4.5) * 10 ** 3);
-  const rbc = Math.floor((r() * (6.1 - 4.7) + 4.7) * 10 ** 6);
-  const t = Math.floor((r() * (4.5 - 1.5) + 1.5) * 10 ** 5);
+  const wbcRef = getRef("whiteBloodCells");
+  const rbcRef = getRef("redBloodCells");
+  const tRef = getRef("thrombocytes");
+  const stemRef = getRef("stemCells");
 
-  const stemCells = Math.floor((r() * (20 - 5) + 5) * 10 ** 4);
+  const wbc = Math.floor(r() * (wbcRef.high - wbcRef.low) + wbcRef.low);
+  const rbc = Math.floor(r() * (rbcRef.high - rbcRef.low) + rbcRef.low);
+  const t = Math.floor(r() * (tRef.high - tRef.low) + tRef.low);
+
+  const stemCells = Math.floor(r() * (stemRef.high - stemRef.low) + stemRef.low);
 
   bvs.whiteBloodCells = wbc;
   bvs.redBloodCells = rbc;
@@ -85,17 +118,21 @@ export const checkNormalVals = (bvs: PatientState): BloodValueRefs => {
     stemCells: 0,
   };
 
+  const wbcRef = getRef("whiteBloodCells");
   res.whiteBloodCells =
-    -(bvs.whiteBloodCells - (11000 + 4500) / 2) / ((11000 - 4500) / 2)
+    -(bvs.whiteBloodCells - (wbcRef.high + wbcRef.low) / 2) / ((wbcRef.high - wbcRef.low) / 2)
 
+  const rbcRef = getRef("redBloodCells");
   res.redBloodCells =
-    -(bvs.redBloodCells - (6100000 + 4700000) / 2) / ((6100000 - 4700000) / 2)
+    -(bvs.redBloodCells - (rbcRef.high + rbcRef.low) / 2) / ((rbcRef.high - 4700000) / 2)
   
+  const tRef = getRef("thrombocytes");
   res.thrombocytes =
-    -(bvs.thrombocytes - (450000 + 150000) / 2) / ((450000 - 150000) / 2)
+    -(bvs.thrombocytes - (tRef.high + tRef.low) / 2) / ((tRef.high - 150000) / 2)
 
+  const stemRef = getRef("stemCells");
   res.stemCells =
-    -(bvs.stemCells - (200000 + 50000) / 2) / ((200000 - 50000) / 2)
+    -(bvs.stemCells - (stemRef.high + stemRef.low) / 2) / ((stemRef.high - stemRef.low) / 2)
 
   return res;
 };
