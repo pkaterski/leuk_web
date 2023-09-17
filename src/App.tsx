@@ -605,16 +605,17 @@ function App() {
             <hr />
 
             {DRUGS.map((drugName) => {
-              return (<>
+              return (
                 <button
                   type="button"
-                  id="alexan-btn"
+                  id={`${drugName}-btn`}
+                  key={drugName}
                   onClick={() => onIntroduceDrug(drugName)}>
 
                   {drugName}
 
                 </button>
-              </>)
+              )
             })}
             
           </div>
