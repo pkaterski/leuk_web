@@ -6,6 +6,7 @@ import { DrugAction, SimulationParameters } from "../leukLogic/leuk";
 type ParametersProps = {
   closeFn: () => void;
   initParams: SimulationParameters;
+  originalParams: SimulationParameters;
   onParamChange: (newParams: SimulationParameters) => void;
   msToDays: number;
 };
@@ -62,7 +63,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
 
   const [criticalTime, setCriticalTime] = useState(0);
 
-  const setToInitialParams = () => {
+  const setValuesToSimParams = () => {
     setInitRedBloodCells(props.initParams.initialConditions.redBloodCells);
     setInitWhiteBloodCells(props.initParams.initialConditions.whiteBloodCells);
     setInitThrombocytes(props.initParams.initialConditions.thrombocytes);
@@ -94,8 +95,40 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
     setCriticalTime(props.initParams.criticalTime);
   };
 
+  const setToOriginalParams = () => {
+    setInitRedBloodCells(props.originalParams.initialConditions.redBloodCells);
+    setInitWhiteBloodCells(props.originalParams.initialConditions.whiteBloodCells);
+    setInitThrombocytes(props.originalParams.initialConditions.thrombocytes);
+    setInitStemCells(props.originalParams.initialConditions.stemCells);
+    setInitLeukemicAggressive(props.originalParams.initialConditions.leukemicAggressive);
+    setInitLeukemicNonAggressive(props.originalParams.initialConditions.leukemicNonAggressive);
+
+    setLeukemicAggressiveGrowth(
+      props.originalParams.growthFactors.leukemicAggressive
+    );
+    setLeukemicNonAggressiveGrowth(
+      props.originalParams.growthFactors.leukemicNonAggressive
+    );
+    setConversionLAtoLNA(
+      props.originalParams.conversionFactors.leukemicAggressiveToNonAggressive
+    );
+    setConversionLNAtoLA(
+      props.originalParams.conversionFactors.leukemicNonAggressiveToAggressive
+    );
+    setKillRBC(props.originalParams.leukemicKillFactor.redBloodCells);
+    setKillWBC(props.originalParams.leukemicKillFactor.whiteBloodCells);
+    setKillT(props.originalParams.leukemicKillFactor.thrombocytes);
+    setKillSteam(props.originalParams.leukemicKillFactor.stemCells);
+    setDrugActions(props.originalParams.drugActions);
+    setRbcNormalization(props.originalParams.normalizationFactor.redBloodCells);
+    setWbcNormalization(props.originalParams.normalizationFactor.whiteBloodCells);
+    setTNormalization(props.originalParams.normalizationFactor.thrombocytes);
+    setStemNormalization(props.originalParams.normalizationFactor.stemCells);
+    setCriticalTime(props.originalParams.criticalTime);
+  };
+
   useEffect(() => {
-    setToInitialParams();
+    setValuesToSimParams();
   }, []);
 
   const handleSave = () => {
@@ -629,7 +662,8 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
       <hr />
 
       <button onClick={handleSave}>save</button>
-      <button onClick={setToInitialParams}>reset</button>
+      <button onClick={setToOriginalParams} style={{backgroundColor: "#F08080"}}>reset</button>
+      <button onClick={setValuesToSimParams} style={{backgroundColor: "lightblue"}}>reset (current)</button>
       <hr />
 
       <button onClick={props.closeFn}>close</button>

@@ -585,6 +585,7 @@ function App() {
                 <Parameters
                   closeFn={close}
                   initParams={simParams}
+                  originalParams={initSimParams}
                   onParamChange={(newParams: SimulationParameters) =>
                     setSimParams(newParams)
                   }
