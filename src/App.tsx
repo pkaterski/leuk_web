@@ -122,6 +122,82 @@ const initSimParams: SimulationParameters = {
         kidneyDamage: 0,
       }
     ],
+    [
+      "Vincristine",
+      {
+        wareOffTime: 15000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.8,
+          whitebloodcells: 0.8,
+          thrombocytes: 0.8,
+          stemCells: 0.8,
+          aggressiveleukemiacells: 0.6,
+          nonAggressiveLeukemiaCells: 0.8,
+        },
+        avgDose: 100,
+        liverDamage: 0,
+        heartDamage: 0,
+        kidneyDamage: 0,
+      }
+    ],
+    [
+      "Farmorubicin",
+      {
+        wareOffTime: 15000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.8,
+          whitebloodcells: 0.8,
+          thrombocytes: 0.8,
+          stemCells: 0.8,
+          aggressiveleukemiacells: 0.6,
+          nonAggressiveLeukemiaCells: 0.8,
+        },
+        avgDose: 100,
+        liverDamage: 0,
+        heartDamage: 0,
+        kidneyDamage: 0,
+      }
+    ],
+    [
+      "Endoxan",
+      {
+        wareOffTime: 15000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.8,
+          whitebloodcells: 0.8,
+          thrombocytes: 0.8,
+          stemCells: 0.8,
+          aggressiveleukemiacells: 0.6,
+          nonAggressiveLeukemiaCells: 0.8,
+        },
+        avgDose: 100,
+        liverDamage: 0,
+        heartDamage: 0,
+        kidneyDamage: 0,
+      }
+    ],
+    [
+      "Urbason",
+      {
+        wareOffTime: 15000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.8,
+          whitebloodcells: 0.8,
+          thrombocytes: 0.8,
+          stemCells: 0.8,
+          aggressiveleukemiacells: 0.6,
+          nonAggressiveLeukemiaCells: 0.8,
+        },
+        avgDose: 100,
+        liverDamage: 0,
+        heartDamage: 0,
+        kidneyDamage: 0,
+      }
+    ],
   ]),
   normalizationFactor: {
     redBloodCells: 235000 / 5,

@@ -3,10 +3,10 @@ export const DRUGS = [
   "Oncaspar",
   "Methotrexate",
   "Alexan",
-  // "Vincristine",
-  // "Farmorubicin",
-  // "Endoxan",
-  // "Urbason",
+  "Vincristine",
+  "Farmorubicin",
+  "Endoxan",
+  "Urbason",
 ] as const;
 export type Drug = typeof DRUGS[number];
 
