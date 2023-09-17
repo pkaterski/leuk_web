@@ -317,6 +317,24 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
               }
             />
             <br />
+            <label>Avarage Dose: </label>
+            <input
+              type="number"
+              min="0"
+              value={drugActions.get(drugName)?.avgDose}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    avgDose: +e.target.value
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
+              }
+            />
+            <br />
             <label>Time to encounter before resistance: </label>
             <input
               type="number"

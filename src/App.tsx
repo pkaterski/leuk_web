@@ -6,7 +6,6 @@ import {
   checkNormalVals,
   DRUGS,
   Drug,
-  AVG_DOSE,
 } from "./leukLogic/initHealthy";
 import {
   beginBVs,
@@ -59,7 +58,7 @@ const initSimParams: SimulationParameters = {
           aggressiveleukemiacells: 0.4,
           nonAggressiveLeukemiaCells: 0.2,
         },
-        avgDose: AVG_DOSE.get("Alexan") as number,
+        avgDose: 75,
         liverDamage: 10,
         heartDamage: 0,
         kidneyDamage: 0,
@@ -78,7 +77,7 @@ const initSimParams: SimulationParameters = {
           aggressiveleukemiacells: 0.6,
           nonAggressiveLeukemiaCells: 0.8,
         },
-        avgDose: AVG_DOSE.get("Oncaspar") as number,
+        avgDose: 100,
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
@@ -97,7 +96,7 @@ const initSimParams: SimulationParameters = {
           aggressiveleukemiacells: 0.6,
           nonAggressiveLeukemiaCells: 0.8,
         },
-        avgDose: AVG_DOSE.get("Methotrexate") as number,
+        avgDose: 100,
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
@@ -116,7 +115,7 @@ const initSimParams: SimulationParameters = {
           aggressiveleukemiacells: 0.6,
           nonAggressiveLeukemiaCells: 0.8,
         },
-        avgDose: AVG_DOSE.get("Mercaptopurine") as number,
+        avgDose: 100,
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
@@ -273,7 +272,7 @@ function App() {
     setBvs((bvs) => {
       // todo figure out why:
       // first time this run it causes a hick up in bvs values
-      const dose = AVG_DOSE.get(drug);
+      const dose = simParamsRef.current.drugActions.get(drug)?.avgDose;
       if (dose === undefined) throw new Error(`INTRO DRUG: AVG DOSE not listed for ${drug}`);
       return {
         ...bvs,
@@ -490,6 +489,7 @@ function App() {
                   closeFn={close}
                   initialTreatmentCourses={therapyCourses}
                   onTreatmentCoursesChange={(tcs) => setTerapyCourses(tcs)}
+                  simulationParameters={simParams}
                 />
               )}
             </Popup>

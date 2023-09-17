@@ -4,7 +4,6 @@ import {
   checkNormalVals,
   Drug,
   BloodValueRefs,
-  AVG_DOSE,
 } from "./initHealthy";
 import { TreatmentCourse } from "./treatment";
 
@@ -73,32 +72,26 @@ function handleDrugAction(
     let resistance = bvs.resistance.find(i => i.drug === drug.type);
     // first time drug is detected befere we consire it's ware-off period
     let firstItter = false;
-    const avgDose = AVG_DOSE.get(drug.type);
-    if (avgDose === undefined) throw new Error("ITTER: DRUG encounters: drug not listed");
+    const drugName = drug.type;
+    const drugAction = drugActions.get(drugName);
+    if (drugAction === undefined) throw new Error("Itter error: drug's action not listed");
+
     if (resistance === undefined) {
       resistance = {
         drug: drug.type,
         resistance: false,
-        encounters: drug.doseMg / avgDose,
+        encounters: drug.doseMg / drugAction.avgDose,
       };
       bvs.resistance.push(resistance);
       drug.countStarted = true;
       firstItter = true;
     } else if (!drug.countStarted) {
-      const avgDose = AVG_DOSE.get(drug.type);
-      if (avgDose === undefined) throw new Error("ITTER: DRUG encounters: drug not listed");
-      resistance.encounters += drug.doseMg / avgDose;
+      resistance.encounters += drug.doseMg / drugAction.avgDose;
       drug.countStarted = true;
       firstItter = true;
     }
   
-    // handle drug wareoff
-    const drugName = drug.type;
-    // const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
-    // if (drugIndex === -1) throw new Error("Unknown drug used");
-    const drugAction = drugActions.get(drugName);
-    if (drugAction === undefined) throw new Error("Itter error: drug's action not listed");
-  
+    // handle drug wareoff  
     const encounterToResistance = drugAction.encounterToResistance;
 
     if (firstItter) {

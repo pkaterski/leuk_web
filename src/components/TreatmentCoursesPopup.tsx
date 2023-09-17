@@ -1,10 +1,12 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { AVG_DOSE, Drug, DRUGS } from "../leukLogic/initHealthy";
+import { Drug, DRUGS } from "../leukLogic/initHealthy";
 import { TreatmentCourse } from "../leukLogic/treatment";
+import { SimulationParameters } from "../leukLogic/leuk";
 type TreatmentCoursesPopupProps = {
   closeFn: () => void;
   initialTreatmentCourses: TreatmentCourse[];
   onTreatmentCoursesChange: (newTcs: TreatmentCourse[]) => void;
+  simulationParameters: SimulationParameters;
 };
 
 const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
@@ -46,7 +48,7 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
   };
 
   const setAvgDoseOnSelectedDrug = (drugInput: Drug) => {
-    const dose = AVG_DOSE.get(drugInput);
+    const dose = props.simulationParameters.drugActions.get(drugInput)?.avgDose;
     if (dose !== undefined)
       setSelectedDose(dose);
   };

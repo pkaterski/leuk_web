@@ -10,14 +10,6 @@ export const DRUGS = [
 ] as const;
 export type Drug = typeof DRUGS[number];
 
-// drug -> dose mg
-export const AVG_DOSE = new Map<Drug, number>([
-  ["Mercaptopurine", 100],
-  ["Oncaspar", 100],
-  ["Methotrexate", 100],
-  ["Alexan", 75],
-]);
-
 export type PatientState = {
   whiteBloodCells: number;
   redBloodCells: number;
