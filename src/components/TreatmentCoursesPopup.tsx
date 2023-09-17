@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Drug, DRUGS } from "../leukLogic/initHealthy";
+import { AVG_DOSE, Drug, DRUGS } from "../leukLogic/initHealthy";
 import { TreatmentCourse } from "../leukLogic/treatment";
 type TreatmentCoursesPopupProps = {
   closeFn: () => void;
@@ -16,6 +16,7 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
   const [selectedDrug, setSelectedDrug] = useState<Drug>("Alexan");
   const [selectedTime, setSelectedTime] = useState(100);
   const [lastedTime, setLatestTime] = useState(100);
+  const [selectedDose, setSelectedDose] = useState(100);
 
   useEffect(() => {
     const initTcs = props.initialTreatmentCourses;
@@ -26,12 +27,13 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
       setLatestTime(lastTcs.atTime);
       setSelectedTime(lastTcs.atTime + 100);
     }
+    setAvgDoseOnSelectedDrug(selectedDrug);
   }, []);
 
   const handleAddCourse = () => {
     const newTcs = [
       ...treatmentCourses,
-      { drug: selectedDrug, atTime: selectedTime },
+      { drug: selectedDrug, atTime: selectedTime, doseMg: selectedDose },
     ];
     setTreatmentCourses(newTcs);
     setLatestTime(selectedTime);
@@ -39,12 +41,24 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
     props.onTreatmentCoursesChange(newTcs);
   };
 
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSelectedTime(+e.target.value);
   };
 
+  const setAvgDoseOnSelectedDrug = (drugInput: Drug) => {
+    const dose = AVG_DOSE.get(drugInput);
+    if (dose !== undefined)
+      setSelectedDose(dose);
+  };
+
   const handleDrugChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedDrug(e.target.value as Drug);
+    const drugInput = e.target.value as Drug;
+    setAvgDoseOnSelectedDrug(drugInput);
+    setSelectedDrug(drugInput);
+  };
+
+  const handleDoseChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedDose(+e.target.value);
   };
 
   const handleRemove = (index: number) => {
@@ -83,6 +97,7 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
           </option>
         ))}
       </select>
+      <label htmlFor="drugAtTimeInput">&nbsp;&nbsp;at time: </label>
       <input
         type="number"
         id="drugAtTimeInput"
@@ -91,13 +106,22 @@ const TreatmentCoursesMenu: React.FC<TreatmentCoursesPopupProps> = (
         value={selectedTime}
         onChange={handleTimeChange}
       />
+      <label htmlFor="drugDoseInput">&nbsp;&nbsp;dose in mg: </label>
+      <input
+        type="number"
+        id="drugDoseInput"
+        min={0}
+        step={5}
+        value={selectedDose}
+        onChange={handleDoseChange}
+      />
       <button onClick={handleAddCourse}>add</button>
       <hr />
       <div style={{ maxHeight: "50vh", overflow: "auto" }}>
         {treatmentCourses.map((tc, index) => {
           return (
             <p style={{ textAlign: "right" }} key={index}>
-              {tc.drug} at time: {tc.atTime} ms
+              {tc.drug} at time: {tc.atTime} ms ({tc.doseMg}  mg)
               <button
                 style={{ marginLeft: "20px" }}
                 onClick={() => handleRemove(index)}

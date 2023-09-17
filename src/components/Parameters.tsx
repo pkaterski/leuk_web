@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { DRUGS } from "../leukLogic/initHealthy";
+import { DRUGS, Drug } from "../leukLogic/initHealthy";
 import { DrugAction, SimulationParameters } from "../leukLogic/leuk";
 
 type ParametersProps = {
@@ -29,26 +29,30 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
   const [killT, setKillT] = useState(0);
   const [killStem, setKillSteam] = useState(0);
 
-  const initDrugActions: DrugAction[] = DRUGS.map((drugName) => {
-    return {
-      name: drugName,
-      wareOffTime: 0,
-      encounterToResistance: 0,
-      killFactor: {
-        redbloodcells: 0,
-        whitebloodcells: 0,
-        thrombocytes: 0,
-        stemCells: 0,
-        aggressiveleukemiacells: 0,
-        nonAggressiveLeukemiaCells: 0,
-      },
-      heartDamage: 0,
-      liverDamage: 0,
-      kidneyDamage: 0,
-    };
-  });
+  const initDrugActions = new Map<Drug,DrugAction>(DRUGS.map((drugName) => {
+    return [
+      drugName,
+      {
+        name: drugName,
+        wareOffTime: 0,
+        encounterToResistance: 0,
+        killFactor: {
+          redbloodcells: 0,
+          whitebloodcells: 0,
+          thrombocytes: 0,
+          stemCells: 0,
+          aggressiveleukemiacells: 0,
+          nonAggressiveLeukemiaCells: 0,
+        },
+        avgDose: 0,
+        heartDamage: 0,
+        liverDamage: 0,
+        kidneyDamage: 0,
+      }
+    ];
+  }));
 
-  const [drugActions, setDrugActions] = useState<DrugAction[]>(initDrugActions);
+  const [drugActions, setDrugActions] = useState<Map<Drug,DrugAction>>(initDrugActions);
 
   const [rbcNormalization, setRbcNormalization] = useState(0);
   const [wbcNormalization, setWbcNormalization] = useState(0);
@@ -299,15 +303,17 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             <input
               type="number"
               min="0"
-              value={drugActions.find((i) => i.name === drugName)?.wareOffTime}
+              value={drugActions.get(drugName)?.wareOffTime}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? { ...d, wareOffTime: +e.target.value }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    wareOffTime: +e.target.value
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -315,15 +321,17 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             <input
               type="number"
               min="0"
-              value={drugActions.find((i) => i.name === drugName)?.encounterToResistance}
+              value={drugActions.get(drugName)?.encounterToResistance}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? { ...d, encounterToResistance: +e.target.value }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    encounterToResistance: +e.target.value
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -331,15 +339,17 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             <input
               type="number"
               min="0"
-              value={drugActions.find((i) => i.name === drugName)?.heartDamage}
+              value={drugActions.get(drugName)?.heartDamage}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? { ...d, heartDamage: +e.target.value }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    heartDamage: +e.target.value
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -347,15 +357,17 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             <input
               type="number"
               min="0"
-              value={drugActions.find((i) => i.name === drugName)?.liverDamage}
+              value={drugActions.get(drugName)?.liverDamage}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? { ...d, liverDamage: +e.target.value }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    liverDamage: +e.target.value
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -363,15 +375,17 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             <input
               type="number"
               min="0"
-              value={drugActions.find((i) => i.name === drugName)?.kidneyDamage}
+              value={drugActions.get(drugName)?.kidneyDamage}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? { ...d, kidneyDamage: +e.target.value }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    kidneyDamage: +e.target.value
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -384,23 +398,22 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
               type="number"
               min="0"
               value={
-                drugActions.find((i) => i.name === drugName)?.killFactor
+                drugActions.get(drugName)?.killFactor
                   .redbloodcells
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? {
-                          ...d,
-                          killFactor: {
-                            ...d.killFactor,
-                            redbloodcells: +e.target.value,
-                          },
-                        }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    killFactor: {
+                      ...oldDrugAction.killFactor,
+                      redbloodcells: +e.target.value,
+                    }
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -410,23 +423,22 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
               type="number"
               min="0"
               value={
-                drugActions.find((i) => i.name === drugName)?.killFactor
+                drugActions.get(drugName)?.killFactor
                   .whitebloodcells
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? {
-                          ...d,
-                          killFactor: {
-                            ...d.killFactor,
-                            whitebloodcells: +e.target.value,
-                          },
-                        }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    killFactor: {
+                      ...oldDrugAction.killFactor,
+                      whitebloodcells: +e.target.value,
+                    }
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -436,23 +448,22 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
               type="number"
               min="0"
               value={
-                drugActions.find((i) => i.name === drugName)?.killFactor
+                drugActions.get(drugName)?.killFactor
                   .thrombocytes
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? {
-                          ...d,
-                          killFactor: {
-                            ...d.killFactor,
-                            thrombocytes: +e.target.value,
-                          },
-                        }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    killFactor: {
+                      ...oldDrugAction.killFactor,
+                      thrombocytes: +e.target.value,
+                    }
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -462,23 +473,22 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
               type="number"
               min="0"
               value={
-                drugActions.find((i) => i.name === drugName)?.killFactor
+                drugActions.get(drugName)?.killFactor
                   .stemCells
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? {
-                          ...d,
-                          killFactor: {
-                            ...d.killFactor,
-                            stemCells: +e.target.value,
-                          },
-                        }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    killFactor: {
+                      ...oldDrugAction.killFactor,
+                      stemCells: +e.target.value,
+                    }
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -488,23 +498,22 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
               type="number"
               min="0"
               value={
-                drugActions.find((i) => i.name === drugName)?.killFactor
+                drugActions.get(drugName)?.killFactor
                   .aggressiveleukemiacells
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? {
-                          ...d,
-                          killFactor: {
-                            ...d.killFactor,
-                            aggressiveleukemiacells: +e.target.value,
-                          },
-                        }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    killFactor: {
+                      ...oldDrugAction.killFactor,
+                      aggressiveleukemiacells: +e.target.value,
+                    }
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <br />
@@ -514,23 +523,22 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
               type="number"
               min="0"
               value={
-                drugActions.find((i) => i.name === drugName)?.killFactor
+                drugActions.get(drugName)?.killFactor
                   .nonAggressiveLeukemiaCells
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDrugActions((ds) =>
-                  ds.map((d) =>
-                    d.name === drugName
-                      ? {
-                          ...d,
-                          killFactor: {
-                            ...d.killFactor,
-                            nonAggressiveLeukemiaCells: +e.target.value,
-                          },
-                        }
-                      : d
-                  )
-                )
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    killFactor: {
+                      ...oldDrugAction.killFactor,
+                      nonAggressiveLeukemiaCells: +e.target.value,
+                    }
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
               }
             />
             <hr />

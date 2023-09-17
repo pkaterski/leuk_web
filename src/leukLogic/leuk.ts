@@ -4,6 +4,7 @@ import {
   checkNormalVals,
   Drug,
   BloodValueRefs,
+  AVG_DOSE,
 } from "./initHealthy";
 import { TreatmentCourse } from "./treatment";
 
@@ -27,19 +28,24 @@ export const beginBVs = introduceLeukemia(initBVs);
 
 // export const CRITICAL_TIME = 30000;
 
-export function getDrugWareOffTime(drug: Drug, drugActions: DrugAction[]): number {
-  switch (drug) {
-    case "Alexan":
-      return drugActions[0].wareOffTime;
-    case "Oncaspar":
-      return drugActions[1].wareOffTime;
-    case "Methotrexate":
-      return drugActions[2].wareOffTime;
-    case "Mercaptopurine":
-      return drugActions[3].wareOffTime;
-    default:
-      throw new Error("Unknown drug");
-  }
+export function getDrugWareOffTime(drug: Drug, drugActions: Map<Drug,DrugAction>): number {
+  const result = drugActions.get(drug)?.wareOffTime;
+  if (result === undefined) {
+    throw new Error("Drug's action not described");
+  };
+  return result;
+  // switch (drug) {
+  //   case "Alexan":
+  //     return drugActions[0].wareOffTime;
+  //   case "Oncaspar":
+  //     return drugActions[1].wareOffTime;
+  //   case "Methotrexate":
+  //     return drugActions[2].wareOffTime;
+  //   case "Mercaptopurine":
+  //     return drugActions[3].wareOffTime;
+  //   default:
+  //     throw new Error("Unknown drug");
+  // }
 }
 
 function handleOrganDamage(bvs: PatientState, drugAction: DrugAction) {
@@ -60,47 +66,55 @@ function handleOrganDamage(bvs: PatientState, drugAction: DrugAction) {
 function handleDrugAction(
   bvs: PatientState,
   timePassed: number,
-  drugActions: DrugAction[],
+  drugActions: Map<Drug,DrugAction>,
 ) {
   for (let n = 0; n < bvs.drugs.length; n++) {
     const drug = bvs.drugs[n];
     let resistance = bvs.resistance.find(i => i.drug === drug.type);
     // first time drug is detected befere we consire it's ware-off period
     let firstItter = false;
+    const avgDose = AVG_DOSE.get(drug.type);
+    if (avgDose === undefined) throw new Error("ITTER: DRUG encounters: drug not listed");
     if (resistance === undefined) {
       resistance = {
         drug: drug.type,
         resistance: false,
-        encounters: 1,
+        encounters: drug.doseMg / avgDose,
         countStarted: true,
       };
       bvs.resistance.push(resistance);
       firstItter = true;
     } else if (!resistance.countStarted) {
-      resistance.encounters++;
+      const avgDose = AVG_DOSE.get(drug.type);
+      if (avgDose === undefined) throw new Error("ITTER: DRUG encounters: drug not listed");
+      resistance.encounters += drug.doseMg / avgDose;
       resistance.countStarted = true;
       firstItter = true;
     }
   
     // handle drug wareoff
     const drugName = drug.type;
-    const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
-    if (drugIndex === -1) throw new Error("Unknown drug used");
+    // const drugIndex = drugActions.findIndex((drug) => drug.name === drugName);
+    // if (drugIndex === -1) throw new Error("Unknown drug used");
+    const drugAction = drugActions.get(drugName);
+    if (drugAction === undefined) throw new Error("Itter error: drug's action not listed");
   
-    const encounterToResistance = drugActions[drugIndex].encounterToResistance;
+    const encounterToResistance = drugAction.encounterToResistance;
 
     if (firstItter) {
-      handleOrganDamage(bvs, drugActions[drugIndex]);
+      handleOrganDamage(bvs, drugAction);
     }
   
     if (resistance !== undefined
       && !resistance.resistance
-      && encounterToResistance < resistance.encounters) {
+      && encounterToResistance < Math.round(resistance.encounters)) {
       resistance.resistance = true;
     }
   
-    const wareOffTime = drugActions[drugIndex].wareOffTime; // getDrugWareOffTime(bvs.drug.type);
-  
+    const wareOffTime = drugAction.wareOffTime; // getDrugWareOffTime(bvs.drug.type);
+
+    const doseFactor = drug.doseMg / drugAction.avgDose;
+
     const t0 = drug.introductionTime;
     const t1 = timePassed;
     const d = t1 - t0;
@@ -111,16 +125,16 @@ function handleDrugAction(
     }
   
     // handle drug action
-    bvs.redBloodCells *= 1 - drugActions[drugIndex].killFactor.redbloodcells;
-    bvs.whiteBloodCells *= 1 - drugActions[drugIndex].killFactor.whitebloodcells;
-    bvs.thrombocytes *= 1 - drugActions[drugIndex].killFactor.thrombocytes;
-    bvs.stemCells *= 1 - drugActions[drugIndex].killFactor.stemCells;
+    bvs.redBloodCells *= 1 - drugAction.killFactor.redbloodcells * doseFactor;
+    bvs.whiteBloodCells *= 1 - drugAction.killFactor.whitebloodcells * doseFactor;
+    bvs.thrombocytes *= 1 - drugAction.killFactor.thrombocytes * doseFactor;
+    bvs.stemCells *= 1 - drugAction.killFactor.stemCells * doseFactor;
   
     if (!resistance.resistance) {
       bvs.aggressiveLeukemiaCells *=
-        1 - drugActions[drugIndex].killFactor.aggressiveleukemiacells;
+        1 - drugAction.killFactor.aggressiveleukemiacells * doseFactor;
       bvs.nonAggressiveLeukemiaCells *=
-        1 - drugActions[drugIndex].killFactor.nonAggressiveLeukemiaCells;
+        1 - drugAction.killFactor.nonAggressiveLeukemiaCells * doseFactor;
     }
   }
 
@@ -175,7 +189,6 @@ function handleCriticalCondition(
 }
 
 export type DrugAction = {
-  name: Drug;
   wareOffTime: number;
   encounterToResistance: number;
   killFactor: {
@@ -186,6 +199,7 @@ export type DrugAction = {
     aggressiveleukemiacells: number;
     nonAggressiveLeukemiaCells: number;
   };
+  avgDose: number,
   heartDamage: number;
   liverDamage: number;
   kidneyDamage: number;
@@ -221,7 +235,7 @@ export type SimulationParameters = {
     thrombocytes: number;
     stemCells: number;
   };
-  drugActions: DrugAction[];
+  drugActions: Map<Drug,DrugAction>;
   normalizationFactor: NormalizationFactor;
   criticalTime: number;
 };
@@ -300,6 +314,7 @@ export function handleIter(
     bvs.drugs.push({
       type: treatment.drug,
       introductionTime: timePassed,
+      doseMg: treatment.doseMg,
     });
   }
 

@@ -6,6 +6,7 @@ import {
   checkNormalVals,
   DRUGS,
   Drug,
+  AVG_DOSE,
 } from "./leukLogic/initHealthy";
 import {
   beginBVs,
@@ -44,72 +45,84 @@ const initSimParams: SimulationParameters = {
     thrombocytes: 0.01,
     stemCells: 0.01,
   },
-  drugActions: [
-    {
-      name: "Alexan",
-      wareOffTime: 1000,
-      encounterToResistance: 8,
-      killFactor: {
-        redbloodcells: 0.2,
-        whitebloodcells: 0.2,
-        thrombocytes: 0.2,
-        stemCells: 0.1,
-        aggressiveleukemiacells: 0.4,
-        nonAggressiveLeukemiaCells: 0.2,
-      },
-      liverDamage: 10,
-      heartDamage: 0,
-      kidneyDamage: 0,
-    },
-    {
-      name: "Oncaspar",
-      wareOffTime: 15000,
-      encounterToResistance: 8,
-      killFactor: {
-        redbloodcells: 0.8,
-        whitebloodcells: 0.8,
-        thrombocytes: 0.8,
-        stemCells: 0.8,
-        aggressiveleukemiacells: 0.6,
-        nonAggressiveLeukemiaCells: 0.8,
-      },
-      liverDamage: 0,
-      heartDamage: 0,
-      kidneyDamage: 0,
-    },
-    {
-      name: "Methotrexate",
-      wareOffTime: 15000,
-      encounterToResistance: 8,
-      killFactor: {
-        redbloodcells: 0.8,
-        whitebloodcells: 0.8,
-        thrombocytes: 0.8,
-        stemCells: 0.8,
-        aggressiveleukemiacells: 0.6,
-        nonAggressiveLeukemiaCells: 0.8,
-      },
-      liverDamage: 0,
-      heartDamage: 0,
-      kidneyDamage: 0,
-    },
-    {
-      name: "Mercaptopurine",
-      wareOffTime: 15000,
-      encounterToResistance: 8,
-      killFactor: {
-        redbloodcells: 0.8,
-        whitebloodcells: 0.8,
-        thrombocytes: 0.8,
-        stemCells: 0.8,
-        aggressiveleukemiacells: 0.6,
-        nonAggressiveLeukemiaCells: 0.8,
-      },
-      liverDamage: 0,
-      heartDamage: 0,
-      kidneyDamage: 0,
-    },
-  ],
+  drugActions: new Map([
+    [
+      "Alexan",
+      {
+        wareOffTime: 1000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.2,
+          whitebloodcells: 0.2,
+          thrombocytes: 0.2,
+          stemCells: 0.1,
+          aggressiveleukemiacells: 0.4,
+          nonAggressiveLeukemiaCells: 0.2,
+        },
+        avgDose: AVG_DOSE.get("Alexan") as number,
+        liverDamage: 10,
+        heartDamage: 0,
+        kidneyDamage: 0,
+      }
+    ],
+    [
+      "Oncaspar",
+      {
+        wareOffTime: 15000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.8,
+          whitebloodcells: 0.8,
+          thrombocytes: 0.8,
+          stemCells: 0.8,
+          aggressiveleukemiacells: 0.6,
+          nonAggressiveLeukemiaCells: 0.8,
+        },
+        avgDose: AVG_DOSE.get("Oncaspar") as number,
+        liverDamage: 0,
+        heartDamage: 0,
+        kidneyDamage: 0,
+      }
+    ],
+    [
+      "Methotrexate",
+      {
+        wareOffTime: 15000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.8,
+          whitebloodcells: 0.8,
+          thrombocytes: 0.8,
+          stemCells: 0.8,
+          aggressiveleukemiacells: 0.6,
+          nonAggressiveLeukemiaCells: 0.8,
+        },
+        avgDose: AVG_DOSE.get("Methotrexate") as number,
+        liverDamage: 0,
+        heartDamage: 0,
+        kidneyDamage: 0,
+      }
+    ],
+    [
+      "Mercaptopurine",
+      {
+        wareOffTime: 15000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.8,
+          whitebloodcells: 0.8,
+          thrombocytes: 0.8,
+          stemCells: 0.8,
+          aggressiveleukemiacells: 0.6,
+          nonAggressiveLeukemiaCells: 0.8,
+        },
+        avgDose: AVG_DOSE.get("Mercaptopurine") as number,
+        liverDamage: 0,
+        heartDamage: 0,
+        kidneyDamage: 0,
+      }
+    ],
+  ]),
   normalizationFactor: {
     redBloodCells: 235000 / 5,
     whiteBloodCells: 225 / 5,
@@ -260,9 +273,11 @@ function App() {
     setBvs((bvs) => {
       // todo figure out why:
       // first time this run it causes a hick up in bvs values
+      const dose = AVG_DOSE.get(drug);
+      if (dose === undefined) throw new Error(`INTRO DRUG: AVG DOSE not listed for ${drug}`);
       return {
         ...bvs,
-        drugs: bvs.drugs.concat({ type: drug, introductionTime: timePassed })
+        drugs: bvs.drugs.concat({ type: drug, introductionTime: timePassed, doseMg: dose })
       };
     });
   };
@@ -274,6 +289,7 @@ function App() {
     setBvs({
       ...initBvsRef.current,
       drugs: [], // active drugs reset
+      resistance: [],
     });
     setBvsAcc([]);
 

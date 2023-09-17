@@ -3,8 +3,20 @@ export const DRUGS = [
   "Oncaspar",
   "Methotrexate",
   "Alexan",
+  // "Vincristine",
+  // "Farmorubicin",
+  // "Endoxan",
+  // "Urbason",
 ] as const;
 export type Drug = typeof DRUGS[number];
+
+// drug -> dose mg
+export const AVG_DOSE = new Map<Drug, number>([
+  ["Mercaptopurine", 100],
+  ["Oncaspar", 100],
+  ["Methotrexate", 100],
+  ["Alexan", 75],
+]);
 
 export type PatientState = {
   whiteBloodCells: number;
@@ -13,7 +25,7 @@ export type PatientState = {
   aggressiveLeukemiaCells: number;
   nonAggressiveLeukemiaCells: number;
   stemCells: number;
-  drugs: { type: Drug; introductionTime: number }[];
+  drugs: { type: Drug; introductionTime: number, doseMg: number; }[]; // todo BUG HERE move countStarted to drugs
   resistance: {
       drug: Drug,
       resistance: boolean,
