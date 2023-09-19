@@ -135,16 +135,16 @@ function handleDrugAction(
     }
   
     // handle drug action
-    bvs.redBloodCells *= 1 - drugAction.killFactor.redbloodcells * doseFactor;
-    bvs.whiteBloodCells *= 1 - drugAction.killFactor.whitebloodcells * doseFactor;
-    bvs.thrombocytes *= 1 - drugAction.killFactor.thrombocytes * doseFactor;
-    bvs.stemCells *= 1 - drugAction.killFactor.stemCells * doseFactor;
+    bvs.redBloodCells *= 1 - Math.min(drugAction.killFactor.redbloodcells * doseFactor, 1);
+    bvs.whiteBloodCells *= 1 - Math.min(drugAction.killFactor.whitebloodcells * doseFactor, 1);
+    bvs.thrombocytes *= 1 - Math.min(drugAction.killFactor.thrombocytes * doseFactor, 1);
+    bvs.stemCells *= 1 - Math.min(drugAction.killFactor.stemCells * doseFactor, 1);
   
     if (!resistance.resistance) {
       bvs.aggressiveLeukemiaCells *=
-        1 - drugAction.killFactor.aggressiveleukemiacells * doseFactor;
+        1 - Math.min(drugAction.killFactor.aggressiveleukemiacells * doseFactor, 1);
       bvs.nonAggressiveLeukemiaCells *=
-        1 - drugAction.killFactor.nonAggressiveLeukemiaCells * doseFactor;
+        1 - Math.min(drugAction.killFactor.nonAggressiveLeukemiaCells * doseFactor, 1);
     }
   }
 
