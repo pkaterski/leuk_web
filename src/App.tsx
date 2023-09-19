@@ -45,6 +45,7 @@ const initSimParams: SimulationParameters = {
     thrombocytes: 0.01,
     stemCells: 0.01,
   },
+  tpmtGene: "TPMT*1/*1",
   drugActions: new Map([
     [
       "Alexan",

@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { DRUGS, Drug } from "../leukLogic/initHealthy";
-import { DrugAction, SimulationParameters } from "../leukLogic/leuk";
+import { DrugAction, SimulationParameters, TPMT, TpmtVals } from "../leukLogic/leuk";
 
 type ParametersProps = {
   closeFn: () => void;
@@ -30,6 +30,8 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
   const [killWBC, setKillWBC] = useState(0);
   const [killT, setKillT] = useState(0);
   const [killStem, setKillSteam] = useState(0);
+
+  const [tpmtGene, setTpmtGene] = useState<TPMT>("TPMT*1/*1");
 
   const initDrugActions = new Map<Drug,DrugAction>(DRUGS.map((drugName) => {
     return [
@@ -93,6 +95,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
     setTNormalization(props.initParams.normalizationFactor.thrombocytes);
     setStemNormalization(props.initParams.normalizationFactor.stemCells);
     setCriticalTime(props.initParams.criticalTime);
+    setTpmtGene(props.initParams.tpmtGene);
   };
 
   const setToOriginalParams = () => {
@@ -125,6 +128,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
     setTNormalization(props.originalParams.normalizationFactor.thrombocytes);
     setStemNormalization(props.originalParams.normalizationFactor.stemCells);
     setCriticalTime(props.originalParams.criticalTime);
+    setTpmtGene(props.originalParams.tpmtGene);
   };
 
   useEffect(() => {
@@ -155,6 +159,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
         thrombocytes: killT,
         stemCells: killStem,
       },
+      tpmtGene: tpmtGene,
       drugActions,
       normalizationFactor: {
         redBloodCells: rbcNormalization,
@@ -234,6 +239,24 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
           setInitLeukemicNonAggressive(+e.target.value)
         }
       />
+      <hr />
+
+      <h4>Specific Parameters</h4>
+      <label>TPMT gene:</label>
+      <select
+        name="drug"
+        id="drugSelect"
+        value={tpmtGene}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+          setTpmtGene(e.target.value as TPMT);
+        }}
+      >
+        {TpmtVals.map((tpmt) => (
+          <option key={tpmt} value={tpmt}>
+            {tpmt}
+          </option>
+        ))}
+      </select>
       <hr />
 
       <h4>Growth factors</h4>

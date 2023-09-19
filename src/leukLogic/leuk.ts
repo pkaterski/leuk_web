@@ -65,8 +65,9 @@ function handleOrganDamage(bvs: PatientState, drugAction: DrugAction) {
 function handleDrugAction(
   bvs: PatientState,
   timePassed: number,
-  drugActions: Map<Drug,DrugAction>,
+  parameters: SimulationParameters,
 ) {
+  const drugActions = parameters.drugActions;
   for (let n = 0; n < bvs.drugs.length; n++) {
     const drug = bvs.drugs[n];
     let resistance = bvs.resistance.find(i => i.drug === drug.type);
@@ -106,7 +107,23 @@ function handleDrugAction(
   
     const wareOffTime = drugAction.wareOffTime; // getDrugWareOffTime(bvs.drug.type);
 
-    const doseFactor = drug.doseMg / drugAction.avgDose;
+    const doseFactor = (() => {
+      const factorRatio = drug.doseMg / drugAction.avgDose;
+      if (drug.type === "Mercaptopurine") {
+        let mercaptopurineFactor = 1;
+        if (parameters.tpmtGene === "TPMT*1/*1") {
+          mercaptopurineFactor = 1;
+        } else if (parameters.tpmtGene === "TPMT*1/*3A") {
+          mercaptopurineFactor = 2;
+        } else if (parameters.tpmtGene === "TPMT*3A/*3A") {
+          mercaptopurineFactor = 10;
+        } else {
+          throw new Error("DOSE FACTOR: Unknow TPMT gene");
+        }
+        return factorRatio * mercaptopurineFactor;
+      }
+      return factorRatio;
+    })();
 
     const t0 = drug.introductionTime;
     const t1 = timePassed;
@@ -205,6 +222,11 @@ export type NormalizationFactor = {
   stemCells: number;
 };
 
+export const TpmtVals = [
+  "TPMT*1/*1", "TPMT*1/*3A", "TPMT*3A/*3A"
+] as const;
+export type TPMT = typeof TpmtVals[number];
+
 export type SimulationParameters = {
   initialConditions: {
     redBloodCells: number;
@@ -228,6 +250,7 @@ export type SimulationParameters = {
     thrombocytes: number;
     stemCells: number;
   };
+  tpmtGene: TPMT;
   drugActions: Map<Drug,DrugAction>;
   normalizationFactor: NormalizationFactor;
   criticalTime: number;
@@ -312,7 +335,7 @@ export function handleIter(
     });
   }
 
-  handleDrugAction(bvs, timePassed, parameters.drugActions);
+  handleDrugAction(bvs, timePassed, parameters);
   normalizeBloodCells(bvs, checkRefs, parameters.normalizationFactor);
 
   checkRefs = checkNormalVals(bvs);
