@@ -394,6 +394,30 @@ function App() {
     setCriticalTime(null);
   };
 
+  const onDownloadWbc = () => {
+    const wbc = bvsAcc.map(bvs => {
+      const sum = bvs.whiteBloodCells + bvs.aggressiveLeukemiaCells + bvs.nonAggressiveLeukemiaCells;
+      return sum / 1000;
+    });
+    const alexanTimes = therapyCourses.filter(i => i.drug === 'Alexan').map(i => i.atTime / MS_TO_DAYS);
+
+    let data = '';
+    data += timePassedAcc.join(',');
+    data += '\n';
+    data += wbc.join(',');
+    data += '\n';
+    data += timePassedAcc.map(i => alexanTimes.includes(i) ? 'A' : '').join(',');
+    data += '\n';
+
+    // download file trick
+    const blob = new Blob([data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'wbc_total.csv');
+    a.click();
+  };
+
   return (
     <div className="App">
       <div className="container">
@@ -603,6 +627,13 @@ function App() {
               // @ts-ignore */}
               {(close: any) => <HelpInformation closeFn={close} />}
             </Popup>
+            <button
+              type="button"
+              id="download-wbc-btn"
+              onClick={onDownloadWbc}
+            >
+              download wbc
+            </button>
             <hr />
 
             {DRUGS.map((drugName) => {
