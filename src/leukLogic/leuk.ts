@@ -35,12 +35,12 @@ export function getDrugWareOffTime(drug: Drug, drugActions: Map<Drug,DrugAction>
   return result;
 }
 
-function handleOrganDamage(bvs: PatientState, drugAction: DrugAction, multiplier: number) {
-  bvs.heartHealth -= drugAction.heartDamage * multiplier;
-  bvs.liverHealth -= drugAction.liverDamage * multiplier;
-  bvs.kidneyHealth -= drugAction.kidneyDamage * multiplier;
-  bvs.neurologicalHealth -= drugAction.neurologicalDamage * multiplier;
-  bvs.endocrinologicalHealth -= drugAction.endocrinologicalDamage * multiplier;
+function handleOrganDamage(bvs: PatientState, drugAction: DrugAction, tpmtMultiplier: number) {
+  bvs.heartHealth -= drugAction.heartDamage * tpmtMultiplier;
+  bvs.liverHealth -= drugAction.liverDamage / tpmtMultiplier;
+  bvs.kidneyHealth -= drugAction.kidneyDamage * tpmtMultiplier;
+  bvs.neurologicalHealth -= drugAction.neurologicalDamage * tpmtMultiplier;
+  bvs.endocrinologicalHealth -= drugAction.endocrinologicalDamage * tpmtMultiplier;
 
   // cap negative values at 0
   bvs.heartHealth *= bvs.heartHealth < 0 ? 0 : 1;
@@ -91,7 +91,7 @@ function handleDrugAction(
     // handle drug wareoff  
     const encounterToResistance = drugAction.encounterToResistance;
 
-    const multiplier = (() => {
+    const tpmtMultiplier = (() => {
       if (drug.type === "Mercaptopurine") {
         if (parameters.tpmtGene === "TPMT*1/*1") {
           return 1;
@@ -108,12 +108,12 @@ function handleDrugAction(
     })();
 
     if (firstItter) {
-      handleOrganDamage(bvs, drugAction, multiplier);
+      handleOrganDamage(bvs, drugAction, tpmtMultiplier);
     }
 
     if (resistance !== undefined
       && !resistance.resistance
-      && encounterToResistance < Math.round(resistance.encounters * multiplier)) {
+      && encounterToResistance < Math.round(resistance.encounters * tpmtMultiplier)) {
       resistance.resistance = true;
     }
   
@@ -121,7 +121,7 @@ function handleDrugAction(
 
     const doseFactor = (() => {
       const factorRatio = drug.doseMg / drugAction.avgDose;
-      return factorRatio * multiplier;
+      return factorRatio * tpmtMultiplier;
     })();
 
     const t0 = drug.introductionTime;
