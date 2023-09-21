@@ -39,12 +39,20 @@ function handleOrganDamage(bvs: PatientState, drugAction: DrugAction, multiplier
   bvs.heartHealth -= drugAction.heartDamage * multiplier;
   bvs.liverHealth -= drugAction.liverDamage * multiplier;
   bvs.kidneyHealth -= drugAction.kidneyDamage * multiplier;
+  bvs.neurologicalHealth -= drugAction.neurologicalDamage * multiplier;
+  bvs.endocrinologicalHealth -= drugAction.endocrinologicalDamage * multiplier;
 
   // cap negative values at 0
   bvs.heartHealth *= bvs.heartHealth < 0 ? 0 : 1;
   bvs.liverHealth *= bvs.liverHealth < 0 ? 0 : 1;
   bvs.kidneyHealth *= bvs.kidneyHealth < 0 ? 0 : 1;
-  if (bvs.heartHealth <= 0 || bvs.liverHealth <= 0 || bvs.kidneyHealth <= 0) {
+  bvs.neurologicalHealth *= bvs.neurologicalHealth < 0 ? 0 : 1;
+  bvs.endocrinologicalHealth *= bvs.endocrinologicalHealth < 0 ? 0 : 1;
+  if (bvs.heartHealth <= 0
+    || bvs.liverHealth <= 0
+    || bvs.kidneyHealth <= 0
+    || bvs.neurologicalHealth <= 0
+    || bvs.endocrinologicalHealth <= 0) {
     bvs.alive = false;
   }
 }
@@ -204,6 +212,8 @@ export type DrugAction = {
   heartDamage: number;
   liverDamage: number;
   kidneyDamage: number;
+  neurologicalDamage: number,
+  endocrinologicalDamage: number,
 };
 
 export type NormalizationFactor = {

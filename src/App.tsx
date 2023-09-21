@@ -36,8 +36,8 @@ const initSimParams: SimulationParameters = {
     leukemicNonAggressive: 1.005,
   },
   conversionFactors: {
-    leukemicAggressiveToNonAggressive: 0.01,
-    leukemicNonAggressiveToAggressive: 0.01,
+    leukemicAggressiveToNonAggressive: 0.005,
+    leukemicNonAggressiveToAggressive: 0.005,
   },
   leukemicKillFactor: {
     redBloodCells: 0.01,
@@ -50,20 +50,22 @@ const initSimParams: SimulationParameters = {
     [
       "Alexan",
       {
-        wareOffTime: 1000,
-        encounterToResistance: 8,
+        wareOffTime: 3000,
+        encounterToResistance: 20,
         killFactor: {
-          redbloodcells: 0.2,
-          whitebloodcells: 0.2,
-          thrombocytes: 0.2,
-          stemCells: 0.1,
-          aggressiveleukemiacells: 0.4,
-          nonAggressiveLeukemiaCells: 0.2,
+          redbloodcells: 0.02,
+          whitebloodcells: 0.02,
+          thrombocytes: 0.02,
+          stemCells: 0.01,
+          aggressiveleukemiacells: 0.04,
+          nonAggressiveLeukemiaCells: 0.02,
         },
         avgDose: 75,
-        liverDamage: 10,
+        liverDamage: 3,
         heartDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ],
     [
@@ -83,6 +85,8 @@ const initSimParams: SimulationParameters = {
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ],
     [
@@ -102,6 +106,8 @@ const initSimParams: SimulationParameters = {
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ],
     [
@@ -121,6 +127,8 @@ const initSimParams: SimulationParameters = {
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ],
     [
@@ -140,6 +148,8 @@ const initSimParams: SimulationParameters = {
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ],
     [
@@ -159,6 +169,8 @@ const initSimParams: SimulationParameters = {
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ],
     [
@@ -178,6 +190,8 @@ const initSimParams: SimulationParameters = {
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ],
     [
@@ -197,16 +211,18 @@ const initSimParams: SimulationParameters = {
         liverDamage: 0,
         heartDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ],
   ]),
   normalizationFactor: {
     redBloodCells: 235000 / 5,
-    whiteBloodCells: 225 / 5,
+    whiteBloodCells: 225 / 5 * 2,
     thrombocytes: 7500 / 5,
-    stemCells: 2500 / 5,
+    stemCells: 2500 / 5 * 2,
   },
-  criticalTime: 30000,
+  criticalTime: 50000,
 };
 
 function App() {
@@ -423,7 +439,7 @@ function App() {
       <div className="container">
         <div className="plot-grid">
           <div className="main-part">
-            <h1>Computer Simulation for Leukemia Treatment</h1>
+            <h2>Computer Simulation for Leukemia Treatment</h2>
 
             <h4>Blood values at day {(timePassed / MS_TO_DAYS).toFixed(1)}:</h4>
 
@@ -509,11 +525,27 @@ function App() {
                 </span>
               </li>
               <li>
-                kidney Health:
+                Kidney Health:
                 <span
                   id="kidney-health"
                 >
                   {bvs.kidneyHealth.toFixed()}
+                </span>
+              </li>
+              <li>
+                Neurological Health:
+                <span
+                  id="kidney-health"
+                >
+                  {bvs.neurologicalHealth.toFixed()}
+                </span>
+              </li>
+              <li>
+                Endocrinologal Health:
+                <span
+                  id="kidney-health"
+                >
+                  {bvs.endocrinologicalHealth.toFixed()}
                 </span>
               </li>
             </ul>

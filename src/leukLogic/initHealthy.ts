@@ -54,6 +54,8 @@ export type PatientState = {
   heartHealth: number; // number between 0 - 100
   liverHealth: number;
   kidneyHealth: number;
+  neurologicalHealth: number;
+  endocrinologicalHealth: number;
   alive: Boolean;
   criticalTimeStart: number | null;
 };
@@ -70,6 +72,8 @@ const bloodValuesZero: PatientState = {
   heartHealth: 100,
   liverHealth: 100,
   kidneyHealth: 100,
+  neurologicalHealth: 100,
+  endocrinologicalHealth: 100,
   alive: true,
   criticalTimeStart: null,
 };

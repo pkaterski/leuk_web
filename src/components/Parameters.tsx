@@ -52,6 +52,8 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
         heartDamage: 0,
         liverDamage: 0,
         kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
       }
     ];
   }));
@@ -463,6 +465,42 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
                   const newDrugAction: DrugAction = {
                     ...oldDrugAction,
                     kidneyDamage: +e.target.value
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
+              }
+            />
+            <br />
+            <label>Neurological Damage: </label>
+            <input
+              type="number"
+              min="0"
+              value={drugActions.get(drugName)?.neurologicalDamage}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    neurologicalDamage: +e.target.value
+                  };
+                  return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
+                })
+              }
+            />
+            <br />
+            <label>Endocrinological Damage: </label>
+            <input
+              type="number"
+              min="0"
+              value={drugActions.get(drugName)?.endocrinologicalDamage}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDrugActions((ds) => {
+                  const oldDrugAction =  ds.get(drugName);
+                  if (oldDrugAction === undefined) return ds;
+                  const newDrugAction: DrugAction = {
+                    ...oldDrugAction,
+                    endocrinologicalDamage: +e.target.value
                   };
                   return new Map([ ...ds.entries(), [drugName, newDrugAction] ])
                 })
