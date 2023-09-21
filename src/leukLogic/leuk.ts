@@ -33,24 +33,12 @@ export function getDrugWareOffTime(drug: Drug, drugActions: Map<Drug,DrugAction>
     throw new Error("Drug's action not described");
   };
   return result;
-  // switch (drug) {
-  //   case "Alexan":
-  //     return drugActions[0].wareOffTime;
-  //   case "Oncaspar":
-  //     return drugActions[1].wareOffTime;
-  //   case "Methotrexate":
-  //     return drugActions[2].wareOffTime;
-  //   case "Mercaptopurine":
-  //     return drugActions[3].wareOffTime;
-  //   default:
-  //     throw new Error("Unknown drug");
-  // }
 }
 
-function handleOrganDamage(bvs: PatientState, drugAction: DrugAction) {
-  bvs.heartHealth -= drugAction.heartDamage;
-  bvs.liverHealth -= drugAction.liverDamage;
-  bvs.kidneyHealth -= drugAction.kidneyDamage;
+function handleOrganDamage(bvs: PatientState, drugAction: DrugAction, multiplier: number) {
+  bvs.heartHealth -= drugAction.heartDamage * multiplier;
+  bvs.liverHealth -= drugAction.liverDamage * multiplier;
+  bvs.kidneyHealth -= drugAction.kidneyDamage * multiplier;
 
   // cap negative values at 0
   bvs.heartHealth *= bvs.heartHealth < 0 ? 0 : 1;
@@ -95,13 +83,29 @@ function handleDrugAction(
     // handle drug wareoff  
     const encounterToResistance = drugAction.encounterToResistance;
 
+    const multiplier = (() => {
+      if (drug.type === "Mercaptopurine") {
+        if (parameters.tpmtGene === "TPMT*1/*1") {
+          return 1;
+        } else if (parameters.tpmtGene === "TPMT*1/*3A") {
+          return 2;
+        } else if (parameters.tpmtGene === "TPMT*3A/*3A") {
+          return 10;
+        } else {
+          throw new Error("DOSE FACTOR: Unknow TPMT gene");
+        }
+      } else {
+        return 1;
+      }
+    })();
+
     if (firstItter) {
-      handleOrganDamage(bvs, drugAction);
+      handleOrganDamage(bvs, drugAction, multiplier);
     }
-  
+
     if (resistance !== undefined
       && !resistance.resistance
-      && encounterToResistance < Math.round(resistance.encounters)) {
+      && encounterToResistance < Math.round(resistance.encounters * multiplier)) {
       resistance.resistance = true;
     }
   
@@ -109,20 +113,7 @@ function handleDrugAction(
 
     const doseFactor = (() => {
       const factorRatio = drug.doseMg / drugAction.avgDose;
-      if (drug.type === "Mercaptopurine") {
-        let mercaptopurineFactor = 1;
-        if (parameters.tpmtGene === "TPMT*1/*1") {
-          mercaptopurineFactor = 1;
-        } else if (parameters.tpmtGene === "TPMT*1/*3A") {
-          mercaptopurineFactor = 2;
-        } else if (parameters.tpmtGene === "TPMT*3A/*3A") {
-          mercaptopurineFactor = 10;
-        } else {
-          throw new Error("DOSE FACTOR: Unknow TPMT gene");
-        }
-        return factorRatio * mercaptopurineFactor;
-      }
-      return factorRatio;
+      return factorRatio * multiplier;
     })();
 
     const t0 = drug.introductionTime;
