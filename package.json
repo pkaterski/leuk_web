@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "sim-script": "tsc scripts/run_sim.ts --outfile scripts/run_sim.js"
+    "sim-script": "npx vite-node scripts/run_sim.ts"
   },
   "dependencies": {
     "@types/plotly.js-basic-dist": "^1.54.1",
@@ -15,7 +15,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-plotly.js": "^2.6.0",
-    "reactjs-popup": "^2.0.5"
+    "reactjs-popup": "^2.0.5",
+    "vite-node": "^0.34.5"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
