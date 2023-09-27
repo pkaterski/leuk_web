@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "sim-script": "npx vite-node scripts/run_sim.ts"
+    "sim-script": "npx vite-node scripts/run_sim.ts; python scripts/show_data.py"
   },
   "dependencies": {
     "@types/plotly.js-basic-dist": "^1.54.1",

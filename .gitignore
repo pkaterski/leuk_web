@@ -2,6 +2,7 @@
 *.log
 tmp/
 # dist/
+out/
 
 *.tern-port
 node_modules/
