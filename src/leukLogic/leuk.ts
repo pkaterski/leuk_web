@@ -159,23 +159,37 @@ function normalizeBloodCells(
   // r but with threshold [-1, 1]
   const normalFactor = (r: number) => (r < -1 ? -1 : r > 1 ? 1 : r);
 
-  bvs.redBloodCells +=
-    normalFactor(checkRefs.redBloodCells)
-    * normalizationFactor.redBloodCells
-    * stemCellFactor;
+  const nfRBC = normalFactor(checkRefs.redBloodCells);
+  const redBloodCellsAmount =
+    nfRBC
+    * normalizationFactor.redBloodCells;
+    // * (nfRBC >= 0 ? stemCellFactor : 1);
 
-  bvs.whiteBloodCells +=
-    normalFactor(checkRefs.whiteBloodCells)
+  bvs.redBloodCells += redBloodCellsAmount;
+
+  const nfWBC = normalFactor(checkRefs.whiteBloodCells);
+  const whiteBloodCellsAmount =
+  nfWBC
     * normalizationFactor.whiteBloodCells
-    * stemCellFactor;
+    * (nfWBC >= 0 ? stemCellFactor : 1);
 
-  bvs.thrombocytes +=
-    normalFactor(checkRefs.thrombocytes)
-    * normalizationFactor.thrombocytes
-    * stemCellFactor;
+  bvs.whiteBloodCells += whiteBloodCellsAmount;
 
-    bvs.stemCells +=
-    normalFactor(checkRefs.stemCells) * normalizationFactor.stemCells;
+  const nfT = normalFactor(checkRefs.thrombocytes)
+  const thrombocytesAmount =
+    nfT
+    * normalizationFactor.thrombocytes;
+    // * (nfT >= 0 ? stemCellFactor : 1);
+
+  bvs.thrombocytes += thrombocytesAmount;
+
+  bvs.stemCells +=
+    normalFactor(checkRefs.stemCells) * normalizationFactor.stemCells
+    // - Math.max(redBloodCellsAmount, 0)
+    // - Math.max(thrombocytesAmount, 0)
+    - Math.max(whiteBloodCellsAmount, 0);
+  
+  bvs.stemCells = bvs.stemCells > 0 ? bvs.stemCells : 0;
   // bvs.stemCells *=
   //   1 + normalFactor(checkRefs.stemCells) * normalizationFactor.stemCells;
 }
@@ -186,7 +200,7 @@ function handleCriticalCondition(
   timePassed: number,
   criticalTime: number
 ) {
-  const hasCritical = !Object.values(checkRefs).every((v) => Math.abs(v) <= 1);
+  const hasCritical = Math.abs(checkRefs.whiteBloodCells) > 1;
 
   if (bvs.criticalTimeStart === null) {
     if (hasCritical) bvs.criticalTimeStart = timePassed;
@@ -267,12 +281,12 @@ export function handleIter(
 
   const bvs = { ...bvsIn };
 
-  // normal cells die
-  bvs.whiteBloodCells *= 0.999;
-  bvs.redBloodCells *= 0.999;
-  bvs.thrombocytes *= 0.999;
-  bvs.aggressiveLeukemiaCells *= 0.999;
-  bvs.nonAggressiveLeukemiaCells *= 0.999;
+  // // normal cells die
+  // bvs.whiteBloodCells *= 0.999;
+  // bvs.redBloodCells *= 0.999;
+  // bvs.thrombocytes *= 0.999;
+  // bvs.aggressiveLeukemiaCells *= 0.999;
+  // bvs.nonAggressiveLeukemiaCells *= 0.999;
 
   // leukemic growth
   if (bvs.drugs.length === 0) {
