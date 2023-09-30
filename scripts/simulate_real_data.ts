@@ -9,7 +9,7 @@ function simulateRealCase(fileName: string) {
   const DAYS_TO_MS = 1000
 
   const inCsv = fs.readFileSync(
-    `/Users/pkaterski/Desktop/leuk_data/conv/${fileName}`,
+    `/Users/pkaterski/Desktop/leuk_data/conv_just_nums/${fileName}`,
     { encoding: 'utf8', flag: 'r' },
   )
   
@@ -17,7 +17,8 @@ function simulateRealCase(fileName: string) {
   
   const firstValue = parseFloat(lines[0][0]) * 1000
   const alexanDays = lines[1].map((i,idx) => i === 'A' ? [idx+1] : []).flat()
-  const totalDays = lines[0].length
+  const dataDays = lines[0].map((i,idx) => i !== '' ? [idx+1] : []).flat()
+  const totalDays = Math.max(alexanDays.slice(-1)[0], dataDays.slice(-1)[0])
   
   
   let treatmentCourse: TreatmentCourse[] = alexanDays.map(i => {
@@ -27,12 +28,14 @@ function simulateRealCase(fileName: string) {
       atTime: (i - 1) * DAYS_TO_MS,
     }
   });
+
+  const initLeukemiaCells = 200
   
   const myBvs: PatientState = {
     ...beginBVs,
-    whiteBloodCells: firstValue - 200,
+    whiteBloodCells: firstValue - initLeukemiaCells,
     aggressiveLeukemiaCells: 0,
-    nonAggressiveLeukemiaCells: 200,
+    nonAggressiveLeukemiaCells: initLeukemiaCells,
     stemCells: 125000,
   }
   
@@ -65,10 +68,16 @@ function simulateRealCase(fileName: string) {
   data += '\n'
   data += ts.map(t => treatmentCourse.findIndex(c => c.atTime === t) !== -1 ? 'A' : '').join(',')
   data += '\n'
+
+  const endBvss = bvss.slice(-1)[0]
+  const leukemiaCells = endBvss.aggressiveLeukemiaCells + endBvss.nonAggressiveLeukemiaCells
+  console.log('-------------------------')
+  console.log(`leukemia cells at end: ${leukemiaCells}`)
+  console.log('-------------------------')
   
   fs.writeFileSync(`out/test1.csv`, data)
 }
 
-const ff = 'FILE_NAME'
+const ff = process.argv[2]
 
 simulateRealCase(ff)

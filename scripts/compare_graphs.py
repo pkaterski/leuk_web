@@ -1,10 +1,11 @@
 import csv
 import matplotlib.pyplot as plt
 from pylab import rcParams
+import sys
 
-FILE_NAME = 'NAME_HERE'
+FILE_NAME = sys.argv[1]
 
-with open(f'conv/{FILE_NAME}', newline='') as csvfile:
+with open(f'/Users/pkaterski/Desktop/leuk_data/conv_just_nums/{FILE_NAME}', newline='') as csvfile:
     lines = csv.reader(csvfile, delimiter=',')
 
     # points 
@@ -27,7 +28,7 @@ with open(f'conv/{FILE_NAME}', newline='') as csvfile:
         data_alexan_x1.append(i + 1)
         data_alexan_y1.append(point)
 
-with open(f'COMPARE.csv', newline='') as csvfile:
+with open(f'out/test1.csv', newline='') as csvfile:
     lines = csv.reader(csvfile, delimiter=',')
 
     # points 
@@ -58,7 +59,7 @@ with open(f'COMPARE.csv', newline='') as csvfile:
 rcParams['figure.figsize'] = 12, 5
 plt.xticks(range(1, len(itter1) + 1))
 
-if not all([i in data_alexan_x1 for i in data_alexan_x2]):
+if not all([i-0 in data_alexan_x1 for i in data_alexan_x2]):
     print("WARNING: ALEXAN MISMATCH")
 
 # for x_l in data_alexan_x2:
@@ -80,8 +81,8 @@ plt.plot(filtered_data_points_x, filtered_data_points_y, 'bo-')
 
 #plt.plot(data_alexan_x1, data_alexan_y1, 'o')
 
-plt.show()
-# plt.savefig(f'comp/{FILE_NAME}.png', dpi=199)
+# plt.show()
+plt.savefig(f'out/a{FILE_NAME}.png', dpi=199)
 plt.close()
 
 

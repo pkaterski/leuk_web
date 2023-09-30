@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "sim-script": "npx vite-node scripts/run_sim.ts; python scripts/show_data.py"
+    "sim-script": "npx vite-node scripts/run_sim.ts; python scripts/show_data.py",
+    "comp-data": "func() { npx vite-node scripts/simulate_real_data.ts $1.csv; python scripts/compare_graphs.py $1.csv; }; func",
+    "comp-all": "for i in {1..11}; do pnpm run comp-data $i; done"
   },
   "dependencies": {
     "@types/plotly.js-basic-dist": "^1.54.1",
