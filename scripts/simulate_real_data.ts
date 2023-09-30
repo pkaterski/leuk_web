@@ -25,7 +25,7 @@ function simulateRealCase(fileName: string) {
     return {
       drug: "Alexan",
       doseMg: 75,
-      atTime: (i - 1) * DAYS_TO_MS,
+      atTime: (i - 0.5) * DAYS_TO_MS,
     }
   });
 

@@ -77,14 +77,24 @@ for i,point in enumerate(data_points_x2):
         filtered_data_points_x.append(data_points_x2[i])
         filtered_data_points_y.append(data_points_y2[i])
 
+plt.plot(data_points_x2, data_points_y2, '--', color='0.4', linewidth=1)
 plt.plot(data_points_x1, data_points_y1, 'go-')
-plt.plot(data_points_x2, data_points_y2, '-', color='0.8')
 plt.plot(filtered_data_points_x, filtered_data_points_y, 'bo-')
+
+import numpy as np
+patient_num = FILE_NAME.replace('.csv','')
+cor = np.corrcoef(data_points_y1, filtered_data_points_y)[1][0]
+diffs = np.array(data_points_y1) - np.array(filtered_data_points_y)
+mae = np.average(np.abs(diffs))
+with open('out/data_app.txt', 'a') as f:
+    f.write(f'\n{patient_num},{round(cor,2)},{round(mae,2)}')
+# plt.title(f'cor = ${cor:.2f}, MAE = ${mae:.2f}')
+plt.title(f'Patient {patient_num}')
 
 #plt.plot(data_alexan_x1, data_alexan_y1, 'o')
 
 # plt.show()
-plt.savefig(f'out/a{FILE_NAME}.png', dpi=199)
+plt.savefig(f'out/b{FILE_NAME}.png', dpi=199)
 plt.close()
 
 
