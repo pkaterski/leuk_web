@@ -58,6 +58,8 @@ with open(f'out/test1.csv', newline='') as csvfile:
 
 rcParams['figure.figsize'] = 12, 5
 plt.xticks(range(1, len(itter1) + 1))
+plt.yticks([i/10 for i in range(0, 113, 8)])
+plt.ylim(0, 12)
 
 if not all([i-0 in data_alexan_x1 for i in data_alexan_x2]):
     print("WARNING: ALEXAN MISMATCH")
