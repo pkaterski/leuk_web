@@ -508,7 +508,7 @@ const Parameters: React.FC<ParametersProps> = (props: ParametersProps) => {
             />
             <br />
 
-            <label>Kill Factors for: (surviving percantage)</label>
+            <label>Kill Factors for</label>
             <br />
 
             <label>Red Blood Cells: </label>
