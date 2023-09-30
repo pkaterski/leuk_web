@@ -11,9 +11,10 @@ export const DRUGS = [
 export type Drug = typeof DRUGS[number];
 
 export const NORMAL_REFERENCES = {
+   // todo change - these are with 6-Mercaptopurine in mind
   whiteBloodCells: {
-    high: 11000,
-    low: 4500,
+    high: 6000,
+    low: 2000,
   },
   redBloodCells: {
     high: 6100000,

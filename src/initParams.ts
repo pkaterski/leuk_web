@@ -28,13 +28,13 @@ export const initSimParams: SimulationParameters = {
     [
       "Alexan",
       {
-        wareOffTime: 3000,
+        wareOffTime: 3500,
         encounterToResistance: 20,
         killFactor: {
           redbloodcells: 0.02,
-          whitebloodcells: 0.02,
+          whitebloodcells: 0.01,
           thrombocytes: 0.02,
-          stemCells: 0.01,
+          stemCells: 0.007,
           aggressiveleukemiacells: 0.04,
           nonAggressiveLeukemiaCells: 0.02,
         },
@@ -196,7 +196,7 @@ export const initSimParams: SimulationParameters = {
   ]),
   normalizationFactor: {
     redBloodCells: 235000 / 5,
-    whiteBloodCells: 225 / 5 * 2,
+    whiteBloodCells: 225 / 5 * 1.6,
     thrombocytes: 7500 / 5,
     stemCells: 2500 / 5 * 2,
   },
