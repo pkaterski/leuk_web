@@ -8,6 +8,7 @@ export const DRUGS = [
   "Endoxan",
   "Urbason",
   "Imatinib",
+  "Nilotinib",
 ] as const;
 export type Drug = typeof DRUGS[number];
 

@@ -214,6 +214,27 @@ export const initSimParams: SimulationParameters = {
         endocrinologicalDamage: 0,
       }
     ],
+    [
+      "Nilotinib",
+      {
+        wareOffTime: 1000,
+        encounterToResistance: 8,
+        killFactor: {
+          redbloodcells: 0.2,
+          whitebloodcells: 0.2,
+          thrombocytes: 0.2,
+          stemCells: 0.2,
+          aggressiveleukemiacells: 0.2,
+          nonAggressiveLeukemiaCells: 0.2,
+        },
+        avgDose: 60,
+        liverDamage: 0,
+        heartDamage: 0,
+        kidneyDamage: 0,
+        neurologicalDamage: 0,
+        endocrinologicalDamage: 0,
+      }
+    ],
   ]),
   normalizationFactor: {
     redBloodCells: 235000 / 5,
