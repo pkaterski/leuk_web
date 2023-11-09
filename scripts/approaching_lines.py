@@ -11,8 +11,8 @@ k=0.04
 xss = []
 yss = []
 
-mul=10
-for i in range(-1*mul,4*mul+1):
+mul=2
+for i in range(0*mul,3*mul+1):
     xs = []
     ys = []
     #initial param
@@ -38,13 +38,17 @@ for i in range(-1*mul,4*mul+1):
     xss.append(xs)
     yss.append(ys)
 
-#plt.axhline(y = Ms, color = 'gray', linestyle = '--', linewidth=0.9)
-#plt.axhline(y = ms, color = 'gray', linestyle = '--', linewidth=0.9)
+plt.axhline(y = Ms, color = 'black', linestyle = '--', linewidth=2.5)
+plt.axhline(y = ms, color = 'black', linestyle = '--', linewidth=2.5)
 
-for i in range(len(xss)):
+for i in reversed(range(len(xss))):
     xs=xss[i]
     ys=yss[i]
-    plt.plot(xs,ys,'-', linewidth=1)
+    plt.plot(xs,ys,'-', linewidth=1.9, label='$\mathregular{s_c}$(0)'+f'={round(ys[0], 2)}')
+
+plt.legend(loc="upper right", fontsize="13")
+plt.xlabel("Изминало време (дни)", fontdict={'size': 17})
+plt.ylabel("Брой клетки $10^9$/L", fontdict={'size': 17})
 plt.show()
 
 
