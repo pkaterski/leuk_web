@@ -125,8 +125,8 @@ function App() {
     );
     setBvs(newBvs);
 
-    setBvsAcc((bvss) => [...bvss, newBvs].slice(-600));
-    setTimePassedAcc((ts) => [...ts, newTimePassed / MS_TO_DAYS].slice(-600));
+    setBvsAcc((bvss) => [...bvss, newBvs].slice(-800));
+    setTimePassedAcc((ts) => [...ts, newTimePassed / MS_TO_DAYS].slice(-800));
 
     setAreNormalVals(checkNormalVals(bvsRef.current));
 
